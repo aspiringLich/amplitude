@@ -1,0 +1,1 @@
+database_url: "postgres://amplitude:amplitude@localhost:5432/amplitude_development"
