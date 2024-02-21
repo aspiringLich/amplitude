@@ -1,6 +1,7 @@
-use std::{fs, time::Duration};
+#![feature(fs_try_exists)]
 
-use migration::{Migrator, MigratorTrait};
+use std::{env, fs, time::Duration};
+
 use sea_orm::{ConnectOptions, Database};
 use tracing::Level;
 
@@ -13,29 +14,27 @@ async fn main() -> color_eyre::Result<()> {
         .init();
     tracing::info!("Starting up...");
 
-    let config: config::Config = serde_yaml::from_str(&fs::read_to_string("config.yaml")?)?;
+    // let config: config::Config = serde_yaml::from_str(&fs::read_to_string("config.yaml")?)?;
 
-    let mut opt = ConnectOptions::new(&config.database_url);
+    if fs::try_exists(".env")? {
+        dotenv::from_filename(".env")?;
+    } else {
+        tracing::warn!("Add a `.env` file in the project root to set DATABASE_URL");
+    }
+    
+    let url = env::var("DATABASE_URL")?;
+    let mut opt = ConnectOptions::new(&url);
     opt.acquire_timeout(Duration::from_secs_f32(1.0))
         .sqlx_logging(false);
 
-    let db = match Database::connect(opt).await {
+    let _db = match Database::connect(opt).await {
         Ok(db) => db,
         Err(e) => {
             tracing::error!("Failed to connect to database!");
             return Err(e.into());
         }
     };
-    tracing::info!("Connected to database at `{}`", config.database_url);
-
-    #[cfg(debug_assertions)]
-    {
-        tracing::info!("DEV: refreshing database...");
-        Migrator::fresh(&db).await?;
-    }
-    
-    
-    
+    tracing::info!("Connected to database at `{}`", &url);
 
     Ok(())
 }
