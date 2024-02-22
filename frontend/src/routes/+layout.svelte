@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import '../app.css';
 </script>
 
@@ -6,16 +6,17 @@
 	<div class="flex min-w-48 flex-col items-stretch bg-zinc-800 p-4 text-white">
 		<div class="relative h-20">
 			<div class="absolute flex h-full w-full justify-around">
-				<div id="wave" class="bg-red-500"></div>
-				<div id="wave" class="bg-orange-500"></div>
-				<div id="wave" class="bg-yellow-500"></div>
-				<div id="wave" class="bg-lime-500"></div>
-				<div id="wave" class="bg-green-500"></div>
-				<div id="wave" class="bg-cyan-500"></div>
-				<div id="wave" class="bg-blue-500"></div>
-				<div id="wave" class="bg-indigo-500"></div>
+				<div id="wave"></div>
+				<div id="wave"></div>
+				<div id="wave"></div>
+				<div id="wave"></div>
+				<div id="wave"></div>
+				<div id="wave"></div>
+				<div id="wave"></div>
+				<div id="wave"></div>
+				<div id="wave"></div>
+				<div id="wave"></div>
 			</div>
-
 			<div
 				class="absolute flex h-full w-full select-none items-center
 				justify-center text-3xl font-bold italic"
@@ -32,7 +33,10 @@
 <style lang="postcss">
 	#wave {
 		@apply h-3.5 w-3.5 rounded-full bg-opacity-50;
-		animation: wave 5s cubic-bezier(0.37, 0, 0.63, 1) infinite alternate;
+		animation:
+			wave 5s cubic-bezier(0.37, 0, 0.63, 1) infinite alternate,
+			color 10s infinite,
+			z-shift 10s infinite;
 	}
 
 	#wave:nth-child(2) {
@@ -56,6 +60,12 @@
 	#wave:nth-child(8) {
 		animation-delay: -7s;
 	}
+	#wave:nth-child(9) {
+		animation-delay: -8s;
+	}
+	#wave:nth-child(10) {
+		animation-delay: -9s;
+	}
 
 	@keyframes wave {
 		0% {
@@ -63,6 +73,65 @@
 		}
 		100% {
 			transform: translateY(4.125rem);
+		}
+	}
+	
+	@keyframes z-shift {
+		0% 20% {
+			z-index: 1;
+		}
+		20%, 80% {
+			z-index: auto;
+		}
+		80%, 100% {
+			z-index: 1;
+		}
+	}
+
+	@keyframes color {
+		0% {
+			background-color: theme("colors.red.500");
+			opacity: 80%;
+		}
+		10% {
+			background-color: theme("colors.orange.500");
+			opacity: 80%;
+		}
+		20% {
+			background-color: theme("colors.yellow.500");
+			opacity: 80%;
+		}
+		30% {
+			background-color: theme("colors.lime.500");
+			opacity: 80%;
+		}
+		40% {
+			background-color: theme("colors.green.500");
+			opacity: 80%;
+		}
+		50% {
+			background-color: theme("colors.cyan.500");
+			opacity: 80%;
+		}
+		60% {
+			background-color: theme("colors.blue.500");
+			opacity: 80%;
+		}
+		70% {
+			background-color: theme("colors.indigo.500");
+			opacity: 80%;
+		}
+		80% {
+			background-color: theme("colors.purple.500");
+			opacity: 80%;
+		}
+		90% {
+			background-color: theme("colors.fuchsia.500");
+			opacity: 80%;
+		}
+		100% {
+			background-color: theme("colors.red.500");
+			opacity: 80%;
 		}
 	}
 </style>
