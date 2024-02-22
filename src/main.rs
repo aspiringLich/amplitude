@@ -41,9 +41,10 @@ async fn main() -> color_eyre::Result<()> {
     };
     tracing::info!("Connected to database at `{}`", &url);
 
+    let router: Router<_> = Router::new().nest("/api", api::routes());
     let state = AppState { cfg: config };
 
-    let router: Router<()> = api::routes().with_state(Arc::new(state));
+    let router: Router<()> = router.with_state(Arc::new(state));
     let listener = tokio::net::TcpListener::bind("localhost:3000").await?;
 
     tracing::info!("Listening on `localhost:3000`");
