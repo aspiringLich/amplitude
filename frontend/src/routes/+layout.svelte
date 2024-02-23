@@ -1,5 +1,6 @@
 <script lang="ts">
-	import '../app.css';
+	import '../styles/app.css';
+	import '../styles/components.css';
 </script>
 
 <div class="flex h-screen w-screen flex-row">
@@ -25,7 +26,7 @@
 			</div>
 		</div>
 	</div>
-	<main>
+	<main class="w-full h-full">
 		<slot />
 	</main>
 </div>
