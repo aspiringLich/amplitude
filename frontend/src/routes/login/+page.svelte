@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
-	type GoogleUser = { client_id: string; credential: string };
-
+	import { PUBLIC_GOOGLE_CLIENT_ID } from '$env/static/public';
+	
+	type GoogleUser = { client_id: string; credential: string; select_by: string };
 	(window as any).login_google = (user: GoogleUser) => {
 		console.log(user);
 	};
@@ -13,7 +14,7 @@
 <div class="content">
 	<div
 		id="g_id_onload"
-		data-client_id="267300721858-ht1n61qg7t0e41simbm1ck7m8ipfmg39.apps.googleusercontent.com"
+		data-client_id={PUBLIC_GOOGLE_CLIENT_ID}
 		data-context="signin"
 		data-ux_mode="popup"
 		data-callback="login_google"
