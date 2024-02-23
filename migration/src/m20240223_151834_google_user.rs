@@ -12,14 +12,18 @@ impl MigrationTrait for Migration {
                     .table(GoogleUser::Table)
                     .if_not_exists()
                     .col(
-                        ColumnDef::new(GoogleUser::Id)
+                        ColumnDef::new(GoogleUser::UserId)
                             .uuid()
+                            .not_null()
+                            .unique_key(),
+                    )
+                    .col(
+                        ColumnDef::new(GoogleUser::GoogleId)
+                            .string()
                             .not_null()
                             .unique_key()
                             .primary_key(),
                     )
-                    
-                    .col(ColumnDef::new(GoogleUser::GoogleId).string().not_null())
                     .to_owned(),
             )
             .await
@@ -35,6 +39,6 @@ impl MigrationTrait for Migration {
 #[derive(DeriveIden)]
 enum GoogleUser {
     Table,
-    Id,
+    UserId,
     GoogleId,
 }
