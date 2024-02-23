@@ -7,8 +7,6 @@ use sea_orm::entity::prelude::*;
 pub enum Account {
     #[sea_orm(string_value = "admin")]
     Admin,
-    #[sea_orm(string_value = "student")]
-    Student,
-    #[sea_orm(string_value = "teacher")]
-    Teacher,
+    #[sea_orm(string_value = "user")]
+    User,
 }

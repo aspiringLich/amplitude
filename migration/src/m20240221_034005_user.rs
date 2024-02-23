@@ -11,8 +11,7 @@ impl MigrationTrait for Migration {
                 Type::create()
                     .as_enum(Alias::new("account"))
                     .values([
-                        Alias::new("student"),
-                        Alias::new("teacher"),
+                        Alias::new("user"),
                         Alias::new("admin"),
                     ])
                     .to_owned(),
@@ -31,7 +30,7 @@ impl MigrationTrait for Migration {
                             .primary_key(),
                     )
                     .col(ColumnDef::new(User::Name).string().not_null())
-                    .col(ColumnDef::new(User::AvatarUrl).string().not_null())
+                    .col(ColumnDef::new(User::AvatarUrl).string())
                     .col(ColumnDef::new(User::Created).timestamp().not_null())
                     .col(
                         ColumnDef::new(User::Account)
