@@ -1,7 +1,10 @@
-use crate::config::Config;
+use sea_orm::DatabaseConnection;
+
+use crate::config::{Config, Secrets};
 
 
-#[derive(Clone)]
 pub struct AppState {
-    pub cfg: Config,
+    pub config: Config,
+    pub secrets: Secrets,
+    pub db: DatabaseConnection,
 }

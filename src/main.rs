@@ -8,18 +8,19 @@ use tracing::Level;
 
 use crate::app::AppState;
 
-mod api;
+mod routes;
 mod app;
 mod config;
 
 #[tokio::main]
-async fn main() -> color_eyre::Result<()> {
+async fn main() -> eyre::Result<()> {
     tracing_subscriber::fmt::fmt()
-        .with_max_level(Level::INFO)
+        .with_max_level(Level::DEBUG)
         .init();
     tracing::info!("Starting up...");
 
     let config: config::Config = serde_yaml::from_str(&fs::read_to_string("config.yaml")?)?;
+    let secrets: config::Secrets = serde_yaml::from_str(&fs::read_to_string("secrets.yaml")?)?;
 
     if fs::try_exists(".env")? {
         dotenv::from_filename(".env")?;
@@ -32,7 +33,7 @@ async fn main() -> color_eyre::Result<()> {
     opt.acquire_timeout(Duration::from_secs_f32(1.0))
         .sqlx_logging(false);
 
-    let _db = match Database::connect(opt).await {
+    let db = match Database::connect(opt).await {
         Ok(db) => db,
         Err(e) => {
             tracing::error!("Failed to connect to database!");
@@ -41,8 +42,8 @@ async fn main() -> color_eyre::Result<()> {
     };
     tracing::info!("Connected to database at `{}`", &url);
 
-    let router: Router<_> = Router::new().nest("/api", api::routes());
-    let state = AppState { cfg: config };
+    let router: Router<_> = routes::routes();
+    let state = AppState { config, secrets, db };
 
     let router: Router<()> = router.with_state(Arc::new(state));
     let listener = tokio::net::TcpListener::bind("localhost:3000").await?;

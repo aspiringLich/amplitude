@@ -1,9 +1,13 @@
-<script lang="ts" context="module">
+<script lang="ts">
 	import { PUBLIC_GOOGLE_CLIENT_ID } from '$env/static/public';
-	
+	import { request } from '$lib/query';
+	import { onDestroy } from 'svelte';
+
 	type GoogleUser = { client_id: string; credential: string; select_by: string };
-	(window as any).login_google = (user: GoogleUser) => {
+	(window as any).login_google = async (user: GoogleUser) => {
 		console.log(user);
+		const res = await request.post('/api/auth/google', { credentials: user.credential });
+		console.log(res);
 	};
 </script>
 
