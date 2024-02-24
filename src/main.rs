@@ -1,4 +1,5 @@
 #![feature(fs_try_exists)]
+#![feature(try_trait_v2)]
 
 use std::{env, fs, sync::Arc, time::Duration};
 
@@ -12,6 +13,7 @@ use crate::app::AppState;
 mod routes;
 mod app;
 mod config;
+mod error;
 
 #[tokio::main]
 async fn main() -> eyre::Result<()> {

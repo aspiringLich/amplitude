@@ -31,7 +31,9 @@ tracing = "0.1.40"
 tracing-subscriber = "0.3.17"
 eyre = "0.6.2"
 tokio = "1.36.0"
-uuid = "1.7.0"
+uuid = { version = "1.7.0", features = ["v7"] }
 dotenv = "0.15.0"
 google-oauth = "1.10.1"
 tower-http = { version = "0.5.2", features = ["cors", "trace"] }
+thiserror = "1.0.57"
+serde_json = "1.0.114"

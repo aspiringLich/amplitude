@@ -1,7 +1,7 @@
 use super::*;
-use entity::google_user::Entity as GoogleUser;
-use entity::user::Entity as User;
+use entity::google_user;
 use google_oauth::AsyncClient;
+use crate::error::{IntoStatusResult, StatusContext, StatusResult};
 
 #[derive(serde::Deserialize)]
 struct GoogleCredentials {
@@ -11,24 +11,26 @@ struct GoogleCredentials {
 async fn google_login(
     State(state): State<AppState>,
     Json(creds): Json<GoogleCredentials>,
-) -> impl IntoResponse {
+) -> StatusResult<Response> {
     let auth = &state.secrets.google_auth;
     let client = AsyncClient::new(&auth.client_id).timeout(Duration::from_secs(5));
-    let payload = match client.validate_id_token(&creds.credentials).await {
-        Ok(payload) => payload,
-        Err(e) => return (StatusCode::UNAUTHORIZED, e.to_string()).into_response(),
-    };
+    let payload = client
+        .validate_id_token(&creds.credentials)
+        .await
+        .err_context(StatusCode::UNAUTHORIZED, "Invalid Google ID Token")?;
     dbg!(&payload);
 
-    match GoogleUser::find_by_id(&payload.aud).one(&state.db).await {
+    match google_user::Entity::find_by_id(&payload.aud).one(&state.db).await {
         Ok(Some(user)) => {
             dbg!(&user);
-            return StatusCode::OK.into_response();
+            return StatusCode::OK.status_result();
         }
         Ok(None) => {
-            return StatusCode::CREATED.into_response();
+            return StatusCode::CREATED.status_result();
         }
-        Err(e) => return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).into_response(),
+        Err(e) => {
+            return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).status_result();
+        }
     }
 }
 
