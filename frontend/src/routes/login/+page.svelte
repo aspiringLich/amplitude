@@ -5,7 +5,6 @@
 
 	type GoogleUser = { client_id: string; credential: string; select_by: string };
 	(window as any).login_google = async (user: GoogleUser) => {
-		console.log(user);
 		const res = await request.post('/api/auth/google', { credentials: user.credential });
 		console.log(res);
 	};

@@ -1,10 +1,7 @@
-use std::default::Default;
-
 use super::*;
 use entity::google_user::Entity as GoogleUser;
 use entity::user::Entity as User;
 use google_oauth::AsyncClient;
-use sea_orm::EntityTrait;
 
 #[derive(serde::Deserialize)]
 struct GoogleCredentials {

@@ -5,6 +5,7 @@ use std::{env, fs, sync::Arc, time::Duration};
 use axum::Router;
 use sea_orm::{ConnectOptions, Database};
 use tracing::Level;
+use tracing_subscriber::{filter, layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::app::AppState;
 
@@ -14,9 +15,17 @@ mod config;
 
 #[tokio::main]
 async fn main() -> eyre::Result<()> {
-    tracing_subscriber::fmt::fmt()
-        .with_max_level(Level::DEBUG)
+    let filter = filter::Targets::new()
+        .with_default(Level::INFO)
+        .with_target("axum", Level::DEBUG)
+        .with_target("tower_http", Level::DEBUG)
+        .with_target("sea_orm", Level::DEBUG)
+        .with_target("sqlx", Level::DEBUG);
+    tracing_subscriber::registry()
+        .with(filter)
+        .with(tracing_subscriber::fmt::layer())
         .init();
+
     tracing::info!("Starting up...");
 
     let config: config::Config = serde_yaml::from_str(&fs::read_to_string("config.yaml")?)?;
