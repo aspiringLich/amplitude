@@ -1,11 +1,22 @@
 use super::*;
-use entity::google_user;
-use google_oauth::AsyncClient;
 use crate::error::{IntoStatusResult, StatusContext, StatusResult};
+use chrono::Utc;
+use entity::google_user;
+use entity::sea_orm_active_enums::Account;
+use entity::user;
+use google_oauth::AsyncClient;
+use sea_orm::ModelTrait;
+use uuid::{NoContext, Timestamp, Uuid};
 
-#[derive(serde::Deserialize)]
+#[derive(Deserialize)]
 struct GoogleCredentials {
     credentials: String,
+}
+
+#[derive(Serialize)]
+struct UserAvatar {
+    name: String,
+    avatar_url: Option<String>,
 }
 
 async fn google_login(
@@ -17,16 +28,63 @@ async fn google_login(
     let payload = client
         .validate_id_token(&creds.credentials)
         .await
-        .err_context(StatusCode::UNAUTHORIZED, "Invalid Google ID Token")?;
-    dbg!(&payload);
+        .err_response(StatusCode::UNAUTHORIZED, "Invalid Google ID Token")?;
 
-    match google_user::Entity::find_by_id(&payload.aud).one(&state.db).await {
-        Ok(Some(user)) => {
-            dbg!(&user);
-            return StatusCode::OK.status_result();
-        }
+    match google_user::Entity::find_by_id(&payload.sub)
+        .one(&state.db)
+        .await
+    {
+        Ok(Some(user)) => match user.find_related(user::Entity).one(&state.db).await {
+            Ok(Some(user)) => {
+                return Json(UserAvatar {
+                    name: user.name,
+                    avatar_url: user.avatar_url,
+                })
+                .status_result();
+            }
+            Ok(None) => unreachable!(),
+            Err(e) => {
+                return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).status_result();
+            }
+        },
         Ok(None) => {
-            return StatusCode::CREATED.status_result();
+            let now = Utc::now();
+            let secs = now.timestamp() as u64;
+            let nanos = now.timestamp_subsec_nanos();
+            let uuid = Uuid::new_v7(Timestamp::from_unix(NoContext, secs, nanos));
+
+            let first = payload.given_name.unwrap_or("FIRSTNAME".to_string());
+            let last = payload.family_name.unwrap_or("LASTNAME".to_string());
+            let name = format!("{} {}", first, last);
+
+            google_user::Entity::insert(google_user::ActiveModel {
+                user_id: Set(uuid),
+                google_id: Set(payload.sub),
+            })
+            .do_nothing()
+            .exec(&state.db)
+            .await
+            .err_context("Failed to create Google user")?;
+            user::Entity::insert(user::ActiveModel {
+                user_id: Set(uuid),
+                account: Set(Account::User),
+                name: Set(name.clone()),
+                avatar_url: Set(payload.picture.clone()),
+                created: Set(now.naive_local()),
+            })
+            .do_nothing()
+            .exec(&state.db)
+            .await
+            .err_context("Failed to create user")?;
+
+            return (
+                StatusCode::CREATED,
+                Json(UserAvatar {
+                    name,
+                    avatar_url: payload.picture,
+                }),
+            )
+                .status_result();
         }
         Err(e) => {
             return (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()).status_result();

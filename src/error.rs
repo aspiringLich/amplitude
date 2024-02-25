@@ -57,34 +57,47 @@ impl<T: Debug> Debug for StatusResult<T> {
 pub struct StatusError(Response<Body>);
 
 pub trait StatusContext<T> {
-    fn err_context<D>(self, status: StatusCode, context: D) -> StatusResult<T>
+    fn err_context<D>(self, context: D) -> StatusResult<T>
     where
         D: Display + Send + Sync + 'static;
 
-    fn err_status(self, status: StatusCode) -> Result<T, StatusError>;
+    fn err_status(self, status: StatusCode) -> StatusResult<T>;
+    
+    fn err_response<D>(self, status: StatusCode, context: D) -> StatusResult<T>
+    where
+        D: Display + Send + Sync + 'static;
 }
 
 impl<T, E> StatusContext<T> for Result<T, E>
 where
     E: Display,
 {
-    fn err_context<D>(self, status: StatusCode, context: D) -> StatusResult<T>
+    fn err_context<D>(self, context: D) -> StatusResult<T>
     where
         D: Display + Send + Sync + 'static,
     {
         match self {
             Ok(value) => StatusResult::Ok(value),
             Err(error) => StatusResult::Err(StatusError((
-                status,
+                StatusCode::INTERNAL_SERVER_ERROR,
                 format!("{context}:\n{error}"),
             ).into_response())),
         }
     }
 
-    fn err_status(self, status: StatusCode) -> Result<T, StatusError> {
+    fn err_status(self, status: StatusCode) -> StatusResult<T> {
         match self {
-            Ok(value) => Ok(value),
-            Err(error) => Err(StatusError((status, error.to_string()).into_response())),
+            Ok(value) => StatusResult::Ok(value),
+            Err(error) => StatusResult::Err(StatusError((status, error.to_string()).into_response())),
+        }
+    }
+    
+    fn err_response<D>(self, status: StatusCode, context: D) -> StatusResult<T>
+        where
+            D: Display + Send + Sync + 'static {
+        match self {
+            Ok(value) => StatusResult::Ok(value),
+            Err(error) => StatusResult::Err(StatusError((status, format!("{context}:\n{error}")).into_response())),
         }
     }
 }
