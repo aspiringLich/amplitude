@@ -1,19 +1,21 @@
 #![feature(fs_try_exists)]
 #![feature(try_trait_v2)]
+#![feature(iter_map_windows)]
 
 use std::{env, fs, sync::Arc, time::Duration};
 
 use axum::Router;
 use sea_orm::{ConnectOptions, Database};
-use tracing::Level;
+use tracing::{Level, Subscriber};
 use tracing_subscriber::{filter, layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::app::AppState;
 
-mod routes;
 mod app;
 mod config;
 mod error;
+mod format;
+mod routes;
 
 #[tokio::main]
 async fn main() -> eyre::Result<()> {
@@ -25,7 +27,7 @@ async fn main() -> eyre::Result<()> {
         .with_target("sqlx", Level::DEBUG);
     tracing_subscriber::registry()
         .with(filter)
-        .with(tracing_subscriber::fmt::layer())
+        .with(tracing_subscriber::fmt::layer().event_format(format::Format))
         .init();
 
     tracing::info!("Starting up...");
@@ -42,7 +44,8 @@ async fn main() -> eyre::Result<()> {
     let url = env::var("DATABASE_URL")?;
     let mut opt = ConnectOptions::new(&url);
     opt.acquire_timeout(Duration::from_secs_f32(1.0))
-        .sqlx_logging(false);
+        .sqlx_logging(true)
+        .sqlx_logging_level(log::LevelFilter::Debug);
 
     let db = match Database::connect(opt).await {
         Ok(db) => db,
@@ -54,7 +57,11 @@ async fn main() -> eyre::Result<()> {
     tracing::info!("Connected to database at `{}`", &url);
 
     let router: Router<_> = routes::routes();
-    let state = AppState { config, secrets, db };
+    let state = AppState {
+        config,
+        secrets,
+        db,
+    };
 
     let router: Router<()> = router.with_state(Arc::new(state));
     let listener = tokio::net::TcpListener::bind("localhost:3000").await?;
