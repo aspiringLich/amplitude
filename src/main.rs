@@ -6,7 +6,7 @@ use std::{env, fs, sync::Arc, time::Duration};
 
 use axum::Router;
 use sea_orm::{ConnectOptions, Database};
-use tracing::{Level, Subscriber};
+use tracing::Level;
 use tracing_subscriber::{filter, layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::app::AppState;

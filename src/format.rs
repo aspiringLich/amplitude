@@ -1,4 +1,4 @@
-use std::{collections::HashMap, fmt};
+use std::fmt;
 
 use nu_ansi_term::Color;
 use tracing::{
@@ -15,7 +15,6 @@ pub struct Format;
 struct Visitor<'a> {
     out: &'a mut String,
     db_statement: String,
-    last_sql: bool,
 }
 
 impl<'a> Visitor<'a> {
@@ -23,7 +22,6 @@ impl<'a> Visitor<'a> {
         Self {
             out,
             db_statement: String::new(),
-            last_sql: false,
         }
     }
 }
