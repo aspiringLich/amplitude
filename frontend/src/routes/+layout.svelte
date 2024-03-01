@@ -1,32 +1,50 @@
 <script lang="ts">
 	import '../styles/app.css';
 	import '../styles/components.css';
+
+	import Avatar from '$lib/components/Avatar.svelte';
+
+	import { account, logged_in } from './login';
 </script>
 
-<div class="flex h-screen w-screen flex-row">
-	<div class="flex min-w-48 flex-col items-stretch bg-zinc-800 p-4 text-white">
-		<div class="relative h-20">
-			<div class="absolute flex h-full w-full justify-around">
-				<div id="wave"></div>
-				<div id="wave"></div>
-				<div id="wave"></div>
-				<div id="wave"></div>
-				<div id="wave"></div>
-				<div id="wave"></div>
-				<div id="wave"></div>
-				<div id="wave"></div>
-				<div id="wave"></div>
-				<div id="wave"></div>
+<div class="flex h-screen w-screen flex-row overflow-hidden">
+	<aside
+		id="sidebar"
+		class="flex w-56 max-w-56 flex-col items-stretch
+		justify-between bg-zinc-800 p-4 text-white"
+	>
+		<div class="relative h-20 w-full">
+			<div class="absolute flex w-full justify-around">
+				<div id="wave" />
+				<div id="wave" />
+				<div id="wave" />
+				<div id="wave" />
+				<div id="wave" />
+				<div id="wave" />
+				<div id="wave" />
+				<div id="wave" />
+				<div id="wave" />
+				<div id="wave" />
+				<div />
 			</div>
 			<div
-				class="absolute flex h-full w-full select-none items-center
-				justify-center text-3xl font-bold italic"
+				class="absolute flex h-full select-none items-center
+				justify-center text-3xl font-bold italic w-full text-center"
 			>
 				amplitude
 			</div>
 		</div>
-	</div>
-	<main class="w-full h-full">
+		<div class="grow"></div>
+		<div class="flex flex-initial items-center">
+			<Avatar src={$account.avatar_url} name={$account.name} class="flex-none" />
+			<div class="ml-1.5 flex min-w-0 shrink flex-col">
+				<span class="text-clamp" class:italic={!$logged_in}>
+					{$account.name || 'Not Logged in'}
+				</span>
+			</div>
+		</div>
+	</aside>
+	<main class="h-full w-full">
 		<slot />
 	</main>
 </div>
@@ -76,62 +94,64 @@
 			transform: translateY(4.125rem);
 		}
 	}
-	
+
 	@keyframes z-shift {
 		0% 20% {
 			z-index: 1;
 		}
-		20%, 80% {
+		20%,
+		80% {
 			z-index: auto;
 		}
-		80%, 100% {
+		80%,
+		100% {
 			z-index: 1;
 		}
 	}
 
 	@keyframes color {
 		0% {
-			background-color: theme("colors.red.500");
+			background-color: theme('colors.red.500');
 			opacity: 80%;
 		}
 		10% {
-			background-color: theme("colors.orange.500");
+			background-color: theme('colors.orange.500');
 			opacity: 80%;
 		}
 		20% {
-			background-color: theme("colors.yellow.500");
+			background-color: theme('colors.yellow.500');
 			opacity: 80%;
 		}
 		30% {
-			background-color: theme("colors.lime.500");
+			background-color: theme('colors.lime.500');
 			opacity: 80%;
 		}
 		40% {
-			background-color: theme("colors.green.500");
+			background-color: theme('colors.green.500');
 			opacity: 80%;
 		}
 		50% {
-			background-color: theme("colors.cyan.500");
+			background-color: theme('colors.cyan.500');
 			opacity: 80%;
 		}
 		60% {
-			background-color: theme("colors.blue.500");
+			background-color: theme('colors.blue.500');
 			opacity: 80%;
 		}
 		70% {
-			background-color: theme("colors.indigo.500");
+			background-color: theme('colors.indigo.500');
 			opacity: 80%;
 		}
 		80% {
-			background-color: theme("colors.purple.500");
+			background-color: theme('colors.purple.500');
 			opacity: 80%;
 		}
 		90% {
-			background-color: theme("colors.fuchsia.500");
+			background-color: theme('colors.fuchsia.500');
 			opacity: 80%;
 		}
 		100% {
-			background-color: theme("colors.red.500");
+			background-color: theme('colors.red.500');
 			opacity: 80%;
 		}
 	}

@@ -7,4 +7,9 @@
 	body {
 		font-family: 'Inter', sans-serif;
 	}
+	
+	.text-clamp {
+		@apply whitespace-nowrap overflow-hidden overflow-ellipsis;
+		@apply max-w-full min-w-0;
+	}
 }

@@ -11,7 +11,7 @@ class RequestClient {
 	}
 	
 	async get(url: string) {
-		return (await this.request(url, 'GET', null)).json();
+		return this.request(url, 'GET', null);
 	}
 
 	async post(url: string, data: any) {

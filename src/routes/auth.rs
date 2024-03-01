@@ -1,9 +1,8 @@
 use super::*;
 use crate::error::{IntoStatusResult, StatusContext, StatusResult};
+
 use chrono::Utc;
-use entity::google_user;
-use entity::sea_orm_active_enums::Account;
-use entity::user;
+use entity::{google_user, sea_orm_active_enums::Account, user};
 use google_oauth::AsyncClient;
 use sea_orm::ModelTrait;
 use uuid::{NoContext, Timestamp, Uuid};
