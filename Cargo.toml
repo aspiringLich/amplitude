@@ -17,6 +17,9 @@ sea-orm = { version = "0.12.14", features = [
 ] }
 serde = "1.0.197"
 serde_yaml = "0.9.32"
+tracing = "0.1.40"
+eyre = "0.6.2"
+
 
 [dependencies]
 entity = { path = "entity" }
@@ -25,11 +28,11 @@ migration = { path = "migration" }
 sea-orm = { workspace = true }
 serde = { workspace = true }
 serde_yaml = { workspace = true }
+tracing = { workspace = true }
+eyre = { workspace = true }
 
 axum = { version = "0.7.1", features = ["macros"] }
-tracing = "0.1.40"
 tracing-subscriber = "0.3.17"
-eyre = "0.6.2"
 tokio = "1.36.0"
 uuid = { version = "1.7.0", features = ["v7"] }
 dotenv = "0.15.0"

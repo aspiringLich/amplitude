@@ -1,6 +1,6 @@
-use axum::{extract::State, http::StatusCode, response::Response, routing::post, Json, Router};
+use axum::{extract::State, routing::post, Json, Router};
 use sea_orm::{ActiveValue::Set, EntityTrait};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::time::Duration;
 use tower_http::cors;
 

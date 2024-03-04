@@ -18,3 +18,14 @@ pub struct Model {
 pub enum Relation {}
 
 impl ActiveModelBehavior for ActiveModel {}
+
+use sea_orm::{InsertResult, IntoActiveModel};
+impl Model {
+    pub async fn get(db: &DatabaseConnection, user_id: Uuid) -> Result<Option<Self>, DbErr> {
+        Entity::find_by_id(user_id).one(db).await
+    }
+
+    pub async fn insert(self, db: &DatabaseConnection) -> Result<InsertResult<ActiveModel>, DbErr> {
+        Entity::insert(self.into_active_model()).exec(db).await
+    }
+}
