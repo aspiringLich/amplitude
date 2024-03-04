@@ -1,7 +1,16 @@
 <script lang="ts">
 	import { PUBLIC_GOOGLE_CLIENT_ID } from '$env/static/public';
 	import { request } from '$lib/query';
-	import { account } from '.';
+	import { account, logged_in } from '.';
+	import Page from '$lib/Page.svelte';
+
+	import { goto, afterNavigate } from '$app/navigation';
+	import { base } from '$app/paths';
+
+	let previousPage: string = base;
+	afterNavigate(({ from }) => {
+		previousPage = from?.url.pathname || previousPage;
+	});
 
 	type GoogleUser = { client_id: string; credential: string; select_by: string };
 	(window as any).login_google = async (user: GoogleUser) => {
@@ -9,6 +18,7 @@
 		if (res.ok) {
 			const user = await res.json();
 			account.set(user);
+			goto(previousPage);
 		}
 		// TODO: error
 	};
@@ -18,18 +28,20 @@
 	<script src="https://accounts.google.com/gsi/client" async defer></script>
 </svelte:head>
 
-<div class="content box">
-	<span class="title">Log Into Amplitude</span>
+<Page class="content box">
+	<span class="title">Log In to Amplitude</span>
 	<div class="login">
-		<div
-			id="g_id_onload"
-			data-client_id={PUBLIC_GOOGLE_CLIENT_ID}
-			data-context="signin"
-			data-ux_mode="popup"
-			data-callback="login_google"
-			data-auto_select="true"
-			data-itp_support="true"
-		/>
+		{#if !$logged_in}
+			<div
+				id="g_id_onload"
+				data-client_id={PUBLIC_GOOGLE_CLIENT_ID}
+				data-context="signin"
+				data-ux_mode="popup"
+				data-callback="login_google"
+				data-auto_select="true"
+				data-itp_support="true"
+			/>
+		{/if}
 		<div
 			class="g_id_signin"
 			data-type="standard"
@@ -40,7 +52,7 @@
 			data-logo_alignment="left"
 		/>
 	</div>
-</div>
+</Page>
 
 <style lang="postcss">
 	.login {

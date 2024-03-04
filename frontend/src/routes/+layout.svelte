@@ -1,6 +1,8 @@
 <script lang="ts">
 	import '../styles/app.css';
 
+	export let data;
+
 	import Avatar from '$lib/components/Avatar.svelte';
 
 	import { account, logged_in } from './login';
@@ -26,25 +28,31 @@
 				<div id="wave" />
 				<div />
 			</div>
-			<div
-				class="absolute flex h-full select-none items-center
-				justify-center text-3xl font-bold italic w-full text-center"
+			<a
+				class="absolute flex h-full w-full select-none
+				items-center justify-center text-center text-3xl font-bold italic"
+				href="/"
 			>
 				amplitude
-			</div>
+			</a>
 		</div>
 		<div class="grow"></div>
-		<div class="flex flex-initial items-center">
+		<a class="flex flex-initial items-center" href="/login">
 			<Avatar src={$account.avatar_url} name={$account.name} class="flex-none" />
-			<div class="ml-1.5 flex min-w-0 shrink flex-col">
-				<span class="text-clamp select-none" class:italic={!$logged_in}>
+			<div class="ml-1.5 flex min-w-0 shrink flex-col leading-3">
+				<span class="line-clamp-1 select-none" class:italic={!$logged_in}>
 					{$account.name || 'Not Logged in'}
 				</span>
+				<span class="line-clamp-1 text-sm italic text-zinc-300">
+					{$logged_in ? 'Logged In' : 'Click to Log In'}
+				</span>
 			</div>
-		</div>
+		</a>
 	</aside>
-	<main class="h-full w-full flex justify-center items-center bg-zinc-200">
-		<slot />
+	<main class="flex h-full w-full items-center justify-center bg-zinc-200">
+		{#key data.url}
+			<slot />
+		{/key}
 	</main>
 </div>
 

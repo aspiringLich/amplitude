@@ -7,22 +7,16 @@
 	body {
 		font-family: 'Inter', sans-serif;
 	}
-	
-	.text-clamp {
-		@apply whitespace-nowrap overflow-hidden;
-		@apply max-w-full min-w-0;
-	}
-	
+
 	.content {
-        @apply flex-none md:w-[36rem] w-full;
-    }
-	
+		@apply w-full flex-none md:w-[36rem];
+	}
+
 	.box {
 		@apply bg-white pb-4;
 	}
-	
+
 	.box .title {
-		@apply text-2xl p-2 text-white bg-zinc-700 block mb-4;
-		@apply text-clamp;
+		@apply mb-4 line-clamp-1 block bg-zinc-800 p-2 text-2xl text-white;
 	}
 }
