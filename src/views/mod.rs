@@ -11,6 +11,7 @@ pub type Result = std::result::Result<Response<Body>, Error>;
 
 macro response($status:ident, $res:ident) {
     /// Return a response with the status code
+    #[allow(dead_code)]
     pub fn $res(res: impl Display + 'static) -> Error {
         Error {
             status: StatusCode::$status,
