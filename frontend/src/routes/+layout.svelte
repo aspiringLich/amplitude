@@ -37,7 +37,7 @@
 		<div class="flex flex-initial items-center">
 			<Avatar src={$account.avatar_url} name={$account.name} class="flex-none" />
 			<div class="ml-1.5 flex min-w-0 shrink flex-col">
-				<span class="text-clamp" class:italic={!$logged_in}>
+				<span class="text-clamp select-none" class:italic={!$logged_in}>
 					{$account.name || 'Not Logged in'}
 				</span>
 			</div>

@@ -10,6 +10,7 @@
 			const user = await res.json();
 			account.set(user);
 		}
+		// TODO: error
 	};
 </script>
 
@@ -18,6 +19,7 @@
 </svelte:head>
 
 <div class="content box">
+	<span class="title">Log Into Amplitude</span>
 	<div class="login">
 		<div
 			id="g_id_onload"
