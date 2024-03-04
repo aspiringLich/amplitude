@@ -1,6 +1,5 @@
 <script lang="ts">
 	import '../styles/app.css';
-	import '../styles/components.css';
 
 	import Avatar from '$lib/components/Avatar.svelte';
 
@@ -10,7 +9,7 @@
 <div class="flex h-screen w-screen flex-row overflow-hidden">
 	<aside
 		id="sidebar"
-		class="flex w-56 max-w-56 flex-col items-stretch
+		class="flex min-w-48 max-w-48 flex-col items-stretch
 		justify-between bg-zinc-800 p-4 text-white"
 	>
 		<div class="relative h-20 w-full">
@@ -44,7 +43,7 @@
 			</div>
 		</div>
 	</aside>
-	<main class="h-full w-full">
+	<main class="h-full w-full flex justify-center items-center bg-zinc-200">
 		<slot />
 	</main>
 </div>

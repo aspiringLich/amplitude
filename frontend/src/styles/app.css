@@ -12,4 +12,12 @@
 		@apply whitespace-nowrap overflow-hidden overflow-ellipsis;
 		@apply max-w-full min-w-0;
 	}
+	
+	.content {
+        @apply flex-none md:w-[36rem] w-full;
+    }
+	
+	.box {
+		@apply md:shadow-lg bg-white;
+	}
 }
