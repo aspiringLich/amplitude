@@ -6,9 +6,9 @@ use axum::{
 use axum_extra::extract::{cookie::Cookie, CookieJar};
 use chrono::Utc;
 use entity::{session, user};
-use sea_orm::DatabaseConnection;
+use sea_orm::{DatabaseConnection, DbErr};
 use serde::Deserialize;
-use std::{cell::Cell, time::Duration};
+use std::time::Duration;
 use tower_http::cors;
 use uuid::{NoContext, Timestamp, Uuid};
 
@@ -36,7 +36,7 @@ impl FromRequestParts<AppState> for Session {
 
     async fn from_request_parts(
         parts: &mut axum::http::request::Parts,
-        state: &AppState,
+        _: &AppState,
     ) -> Result<Self, Self::Rejection> {
         let jar = CookieJar::from_request_parts(parts, &())
             .await
@@ -49,8 +49,15 @@ impl FromRequestParts<AppState> for Session {
 }
 
 impl Session {
-    pub fn get(&self, db: &DatabaseConnection) -> Option<user::Model> {
-        todo!()
+    pub async fn get(&self, db: &DatabaseConnection) -> Result<Option<user::Model>, DbErr> {
+        let Some(session_id) = self.session_id else {
+            return Ok(None);
+        };
+        let session = session::Model::get(db, session_id).await?;
+        match session {
+            Some(session) => Ok(Some(session.find_related_user(db).await?)),
+            None => Ok(None),
+        }
     }
 
     #[must_use]
@@ -77,5 +84,17 @@ impl Session {
         cookie.make_permanent();
 
         Ok(self.jar.add(cookie))
+    }
+
+    #[must_use]
+    pub async fn get_or_add(
+        self,
+        db: &DatabaseConnection,
+        user_id: Uuid,
+    ) -> Result<CookieJar, views::Error> {
+        match self.get(db).await? {
+            Some(_) => Ok(self.jar),
+            None => self.add(db, user_id).await,
+        }
     }
 }

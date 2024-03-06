@@ -1,13 +1,11 @@
+use self::views::auth::login;
+
 use super::*;
-use crate::views::{
-    auth::{user_avatar, UserAvatar},
-    internal, unauthorized, Error,
-};
+use crate::views::{unauthorized, Error};
 
 use axum::{
     body::Body,
-    http::{header::CONTENT_TYPE, HeaderName, Response, StatusCode},
-    response::{AppendHeaders, IntoResponse},
+    http::{Response, StatusCode},
 };
 use chrono::Utc;
 use entity::{google_user, sea_orm_active_enums::Account, user};
@@ -20,6 +18,7 @@ struct GoogleCredentials {
     credentials: String,
 }
 
+#[axum::debug_handler]
 async fn google_login(
     session: Session,
     State(state): State<AppState>,
@@ -35,7 +34,10 @@ async fn google_login(
 
     match google_user::Model::get(&state.db, &payload.sub).await? {
         // google user found; find related user
-        Some(user) => Ok(user_avatar(user.find_related_user(&state.db).await?).into_response()),
+        Some(guser) => {
+            let user = guser.find_related_user(&state.db).await?;
+            login(&state.db, session, &user, StatusCode::OK).await
+        }
         // no user found; create one
         None => {
             let now = Utc::now();
@@ -54,27 +56,16 @@ async fn google_login(
             .insert(&state.db)
             .await?;
 
-            user::Model {
+            let user = user::Model {
                 user_id: uuid,
                 account: Account::User,
                 name: name.clone(),
                 avatar_url: payload.picture.clone(),
                 created: now.naive_local(),
-            }
-            .insert(&state.db)
-            .await?;
-
-            let user_avatar = UserAvatar {
-                name,
-                avatar_url: payload.picture,
             };
-            let res = (
-                StatusCode::CREATED,
-                session.add(&state.db, uuid).await?,
-                AppendHeaders([(CONTENT_TYPE, "application/json")]),
-                serde_json::to_string(&user_avatar).map_err(internal)?,
-            )
-                .into_response();
+            let res = login(&state.db, session, &user, StatusCode::CREATED).await?;
+            user.insert(&state.db).await?;
+
             Ok(res)
         }
     }
