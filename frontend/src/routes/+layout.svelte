@@ -3,29 +3,13 @@
 
 	export let data;
 
-	import Avatar from '$lib/components/Avatar.svelte';
-
 	import { account, logged_in } from './login';
 	import { onMount } from 'svelte';
-	import { request } from '$lib/request';
 	import AvatarSection from './AvatarSection.svelte';
-	
 
 	onMount(async () => {
-		if (!$logged_in) {
-			let session = document.cookie
-				.split('; ')
-				.find((c) => c.startsWith('session='))
-				?.slice(8);
-			console.log(document.cookie);
-			if (session) {
-				console.log(session);
-				const res = await request.get('/api/auth/session');
-				if (res.ok) {
-					const user = await res.json();
-					account.set(user);
-				}
-			}
+		if (!$logged_in && data.avatar) {
+			$account = data.avatar;
 		}
 	});
 </script>

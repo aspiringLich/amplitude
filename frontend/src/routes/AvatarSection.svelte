@@ -5,7 +5,7 @@
 	export let src: string | undefined = undefined;
 </script>
 
-<a class="flex flex-initial items-center" href="/login">
+<a class="flex flex-initial items-center select-none" href="/login">
 	<Avatar {src} {name} class="flex-none" />
 	<div class="ml-1.5 flex min-w-0 shrink flex-col leading-3">
 		<span class="line-clamp-1 select-none" class:italic={!name}>

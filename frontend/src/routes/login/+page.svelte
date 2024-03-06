@@ -9,7 +9,7 @@
 
 	let previousPage: string = base;
 	afterNavigate(({ from }) => {
-		previousPage = from?.url.pathname || previousPage;
+		previousPage = from?.url?.pathname || previousPage;
 	});
 
 	type GoogleUser = { client_id: string; credential: string; select_by: string };
@@ -24,13 +24,10 @@
 	};
 </script>
 
-<svelte:head>
-	<script src="https://accounts.google.com/gsi/client" async defer></script>
-</svelte:head>
-
 <Page class="content box">
 	<span class="title">Log In to Amplitude</span>
 	<div class="login">
+		<script src="https://accounts.google.com/gsi/client" async defer></script>
 		{#if !$logged_in}
 			<div
 				id="g_id_onload"
@@ -40,6 +37,12 @@
 				data-callback="login_google"
 				data-auto_select="true"
 				data-itp_support="true"
+			/>
+		{:else}
+			<div
+				id="g_id_onload"
+				data-client_id={PUBLIC_GOOGLE_CLIENT_ID}
+				data-callback="login_google"
 			/>
 		{/if}
 		<div
