@@ -1,4 +1,7 @@
-use super::{json, Result};
+use crate::routes::Session;
+
+use super::Error;
+use axum::Json;
 use entity::user;
 use serde::Serialize;
 
@@ -8,8 +11,8 @@ pub struct UserAvatar {
     pub avatar_url: Option<String>,
 }
 
-pub fn user_avatar(user: user::Model) -> Result {
-    json(UserAvatar {
+pub fn user_avatar(user: user::Model) -> Json<UserAvatar> {
+    Json(UserAvatar {
         name: user.name,
         avatar_url: user.avatar_url,
     })

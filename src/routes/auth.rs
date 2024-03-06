@@ -1,9 +1,14 @@
 use super::*;
 use crate::views::{
     auth::{user_avatar, UserAvatar},
-    json_created, unauthorized, Result,
+    internal, unauthorized, Error,
 };
 
+use axum::{
+    body::Body,
+    http::{header::CONTENT_TYPE, HeaderName, Response, StatusCode},
+    response::{AppendHeaders, IntoResponse},
+};
 use chrono::Utc;
 use entity::{google_user, sea_orm_active_enums::Account, user};
 use eyre::Context;
@@ -16,9 +21,10 @@ struct GoogleCredentials {
 }
 
 async fn google_login(
+    session: Session,
     State(state): State<AppState>,
     Json(creds): Json<GoogleCredentials>,
-) -> Result {
+) -> Result<Response<Body>, Error> {
     let auth = &state.secrets.google_auth;
     let client = AsyncClient::new(&auth.client_id).timeout(Duration::from_secs(5));
     let payload = client
@@ -29,7 +35,7 @@ async fn google_login(
 
     match google_user::Model::get(&state.db, &payload.sub).await? {
         // google user found; find related user
-        Some(user) => user_avatar(user.find_related_user(&state.db).await?),
+        Some(user) => Ok(user_avatar(user.find_related_user(&state.db).await?).into_response()),
         // no user found; create one
         None => {
             let now = Utc::now();
@@ -58,10 +64,18 @@ async fn google_login(
             .insert(&state.db)
             .await?;
 
-            return json_created(UserAvatar {
+            let user_avatar = UserAvatar {
                 name,
                 avatar_url: payload.picture,
-            });
+            };
+            let res = (
+                StatusCode::CREATED,
+                session.add(&state.db, uuid).await?,
+                AppendHeaders([(CONTENT_TYPE, "application/json")]),
+                serde_json::to_string(&user_avatar).map_err(internal)?,
+            )
+                .into_response();
+            Ok(res)
         }
     }
 }

@@ -7,6 +7,7 @@ use std::{env, fs, sync::Arc, time::Duration};
 
 use axum::Router;
 use sea_orm::{ConnectOptions, Database};
+use tokio::signal;
 use tracing::Level;
 use tracing_subscriber::{filter, layer::SubscriberExt, util::SubscriberInitExt};
 
@@ -25,7 +26,8 @@ async fn main() -> eyre::Result<()> {
         .with_target("axum", Level::DEBUG)
         .with_target("tower_http", Level::DEBUG)
         .with_target("sea_orm", Level::DEBUG)
-        .with_target("sqlx", Level::DEBUG);
+        .with_target("sqlx", Level::DEBUG)
+        .with_target("amplitude", Level::TRACE);
     tracing_subscriber::registry()
         .with(filter)
         .with(tracing_subscriber::fmt::layer().event_format(format::Format))
@@ -61,15 +63,48 @@ async fn main() -> eyre::Result<()> {
     let state = AppState {
         config,
         secrets,
-        db,
+        db: db.clone(),
     };
 
-    let router: Router<()> = router.with_state(Arc::new(state));
+    let state = Arc::new(state);
+    let router: Router<()> = router.with_state(state);
     let listener = tokio::net::TcpListener::bind("localhost:3000").await?;
 
     tracing::info!("Listening on `localhost:3000`");
 
-    axum::serve(listener, router).await?;
+    axum::serve(listener, router)
+        .with_graceful_shutdown(shutdown_signal())
+        .await?;
+    db.close().await?;
+    tracing::info!("Done!");
 
     Ok(())
+}
+
+/// stolen from https://github.com/maxcountryman/tower-sessions-stores/blob/main/sqlx-store/README.md
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .expect("failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("failed to install signal handler")
+            .recv()
+            .await;
+    };
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+    _ = ctrl_c => {
+            tracing::info!("Ctrl-C! Shutting down...");
+        },
+        _ = terminate => {
+            tracing::info!("Terminate! Shutting down...");
+        },
+    }
 }

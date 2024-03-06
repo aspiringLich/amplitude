@@ -32,12 +32,14 @@ tracing = { workspace = true }
 eyre = { workspace = true }
 
 axum = { version = "0.7.1", features = ["macros"] }
+axum-extra = { version = "0.9.2", features = ["cookie"] }
+tower-http = { version = "0.5.2", features = ["cors", "trace"] }
+
 tracing-subscriber = "0.3.17"
-tokio = "1.36.0"
+tokio = { version = "1.36.0", features = ["signal"] }
 uuid = { version = "1.7.0", features = ["v7"] }
 dotenv = "0.15.0"
 google-oauth = "1.10.1"
-tower-http = { version = "0.5.2", features = ["cors", "trace"] }
 thiserror = "1.0.57"
 serde_json = "1.0.114"
 chrono = "0.4.34"

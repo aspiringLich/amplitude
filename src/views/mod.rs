@@ -7,8 +7,6 @@ use std::fmt::Display;
 
 pub mod auth;
 
-pub type Result = std::result::Result<Response<Body>, Error>;
-
 macro response($status:ident, $res:ident) {
     /// Return a response with the status code
     #[allow(dead_code)]
@@ -27,26 +25,6 @@ response!(UNAUTHORIZED, unauthorized);
 response!(FORBIDDEN, forbidden);
 response!(NOT_FOUND, not_found);
 response!(INTERNAL_SERVER_ERROR, internal);
-
-pub fn json<T: serde::Serialize>(data: T) -> Result {
-    match serde_json::to_string(&data) {
-        Ok(json) => Err(Error {
-            status: StatusCode::OK,
-            message: Box::new(json),
-        }),
-        Err(e) => Err(internal(e)),
-    }
-}
-
-pub fn json_created<T: serde::Serialize>(data: T) -> Result {
-    match serde_json::to_string(&data) {
-        Ok(json) => Err(Error {
-            status: StatusCode::CREATED,
-            message: Box::new(json),
-        }),
-        Err(e) => Err(internal(e)),
-    }
-}
 
 pub struct Error {
     pub status: StatusCode,
