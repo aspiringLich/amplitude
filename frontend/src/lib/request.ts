@@ -1,15 +1,16 @@
-import { browser, dev } from "$app/environment";
+import { browser, dev } from '$app/environment';
 
 class RequestClient {
 	async request(url: string, method: string, data?: any, init?: RequestInit) {
-		const req = new Request(url, { method, body: JSON.stringify(data), ...init });
-		if (data)
-			req.headers.set('Content-Type', 'application/json');
+		let opts = { method, ...init };
+		if (data) opts.body = JSON.stringify(data);
+		const req = new Request(url, opts);
+		if (data) req.headers.set('Content-Type', 'application/json');
 		const response = await fetch(req);
 		if (!response.ok) throw new Error(response.statusText);
 		return response;
 	}
-	
+
 	async get(url: string) {
 		return this.request(url, 'GET', null);
 	}

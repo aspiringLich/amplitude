@@ -14,12 +14,12 @@
 	const {
 		elements: { image, fallback },
 		states,
-        options,
-	} = createAvatar();
+		options
+	} = createAvatar({ src: src || '' });
 
 	$: {
-        options.src.set(src || '');
-    }
+		options.src.set(src || '');
+	}
 </script>
 
 <div class="avatar flex {size} items-center justify-center rounded-full bg-zinc-500 {_class}">

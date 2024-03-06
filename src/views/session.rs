@@ -65,6 +65,7 @@ impl Session {
 
         let mut cookie = Cookie::new("session", session_id.as_simple().to_string());
         cookie.make_permanent();
+        cookie.set_path("/");
 
         Ok(self.jar.add(cookie))
     }

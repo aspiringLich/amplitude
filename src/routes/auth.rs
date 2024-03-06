@@ -1,4 +1,7 @@
-use self::views::auth::login;
+use self::views::{
+    auth::{login, UserAvatar},
+    not_found,
+};
 
 use super::*;
 use crate::views::{unauthorized, Error};
@@ -6,6 +9,8 @@ use crate::views::{unauthorized, Error};
 use axum::{
     body::Body,
     http::{Response, StatusCode},
+    response::IntoResponse,
+    routing::get,
 };
 use chrono::Utc;
 use entity::{google_user, sea_orm_active_enums::Account, user};
@@ -18,7 +23,6 @@ struct GoogleCredentials {
     credentials: String,
 }
 
-#[axum::debug_handler]
 async fn google_login(
     session: Session,
     State(state): State<AppState>,
@@ -71,6 +75,18 @@ async fn google_login(
     }
 }
 
+async fn session(
+    session: Session,
+    State(state): State<AppState>,
+) -> Result<Json<UserAvatar>, Error> {
+    match session.get(&state.db).await? {
+        Some(s) => Ok(Json(UserAvatar::new(&s))),
+        None => Err(not_found("Session not found")),
+    }
+}
+
 pub fn routes() -> Router<AppState> {
-    Router::new().route("/google", post(google_login))
+    Router::new()
+        .route("/google", post(google_login))
+        .route("/session", get(session))
 }

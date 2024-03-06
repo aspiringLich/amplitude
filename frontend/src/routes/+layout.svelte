@@ -6,6 +6,28 @@
 	import Avatar from '$lib/components/Avatar.svelte';
 
 	import { account, logged_in } from './login';
+	import { onMount } from 'svelte';
+	import { request } from '$lib/request';
+	import AvatarSection from './AvatarSection.svelte';
+	
+
+	onMount(async () => {
+		if (!$logged_in) {
+			let session = document.cookie
+				.split('; ')
+				.find((c) => c.startsWith('session='))
+				?.slice(8);
+			console.log(document.cookie);
+			if (session) {
+				console.log(session);
+				const res = await request.get('/api/auth/session');
+				if (res.ok) {
+					const user = await res.json();
+					account.set(user);
+				}
+			}
+		}
+	});
 </script>
 
 <div class="flex h-screen w-screen flex-row overflow-hidden">
@@ -37,17 +59,11 @@
 			</a>
 		</div>
 		<div class="grow"></div>
-		<a class="flex flex-initial items-center" href="/login">
-			<Avatar src={$account.avatar_url} name={$account.name} class="flex-none" />
-			<div class="ml-1.5 flex min-w-0 shrink flex-col leading-3">
-				<span class="line-clamp-1 select-none" class:italic={!$logged_in}>
-					{$account.name || 'Not Logged in'}
-				</span>
-				<span class="line-clamp-1 text-sm italic text-zinc-300">
-					{$logged_in ? 'Logged In' : 'Click to Log In'}
-				</span>
-			</div>
-		</a>
+		{#if data.avatar}
+			<AvatarSection name={data.avatar.name} src={data.avatar.avatar_url} />
+		{:else}
+			<AvatarSection name={$account.name} src={$account.avatar_url} />
+		{/if}
 	</aside>
 	<main class="flex h-full w-full items-center justify-center bg-zinc-200">
 		{#key data.url}

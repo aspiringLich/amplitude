@@ -10,9 +10,18 @@ use sea_orm::DatabaseConnection;
 use serde::Serialize;
 
 #[derive(Serialize)]
-pub struct UserAvatar<'a> {
-    pub name: &'a str,
-    pub avatar_url: Option<&'a str>,
+pub struct UserAvatar {
+    pub name: String,
+    pub avatar_url: Option<String>,
+}
+
+impl UserAvatar {
+    pub fn new(user: &user::Model) -> Self {
+        Self {
+            name: user.name.clone(),
+            avatar_url: user.avatar_url.clone(),
+        }
+    }
 }
 
 pub async fn login(
@@ -25,11 +34,7 @@ pub async fn login(
         code,
         session.get_or_add(db, user.user_id).await?,
         AppendHeaders([(CONTENT_TYPE, "application/json")]),
-        serde_json::to_string(&UserAvatar {
-            name: &user.name,
-            avatar_url: user.avatar_url.as_ref().map(String::as_str),
-        })
-        .map_err(internal)?,
+        serde_json::to_string(&UserAvatar::new(user)).map_err(internal)?,
     )
         .into_response())
 }

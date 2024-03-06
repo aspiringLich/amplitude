@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { PUBLIC_GOOGLE_CLIENT_ID } from '$env/static/public';
-	import { request } from '$lib/query';
+	import { request } from '$lib/request';
 	import { account, logged_in } from '.';
 	import Page from '$lib/Page.svelte';
 
