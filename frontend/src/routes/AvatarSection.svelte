@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Avatar from '$lib/components/Avatar.svelte';
+	import Avatar from '$cpt/Avatar.svelte';
 
 	export let name: string | undefined = undefined;
 	export let src: string | undefined = undefined;

@@ -2,6 +2,13 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import yaml from 'yaml';
 import fs from 'fs';
+import aliases from './alias.json' assert { type: 'json' };
+import path from 'path';
+
+let alias: { [key: string]: string } = {};
+for (const [key, value] of Object.entries(aliases)) {
+	alias[key] = path.resolve(value);
+}
 
 const secrets = yaml.parse(fs.readFileSync('../secrets.yaml').toString());
 
@@ -21,5 +28,8 @@ export default defineConfig({
 				rewrite: (path) => path.replace(/^\/api/, '')
 			}
 		}
+	},
+	resolve: {
+		alias
 	}
 });
