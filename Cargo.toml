@@ -19,7 +19,7 @@ serde = "1.0.197"
 serde_yaml = "0.9.32"
 tracing = "0.1.40"
 eyre = "0.6.2"
-
+chrono = "0.4.34"
 
 [dependencies]
 entity = { path = "entity" }
@@ -30,6 +30,7 @@ serde = { workspace = true }
 serde_yaml = { workspace = true }
 tracing = { workspace = true }
 eyre = { workspace = true }
+chrono = { workspace = true }
 
 axum = { version = "0.7.1", features = ["macros"] }
 axum-extra = { version = "0.9.2", features = ["cookie"] }
@@ -42,6 +43,5 @@ dotenv = "0.15.0"
 google-oauth = "1.10.1"
 thiserror = "1.0.57"
 serde_json = "1.0.114"
-chrono = "0.4.34"
 log = "0.4.20"
 nu-ansi-term = "0.50.0"

@@ -9,7 +9,6 @@ use crate::views::{unauthorized, Error};
 use axum::{
     body::Body,
     http::{Response, StatusCode},
-    response::IntoResponse,
     routing::get,
 };
 use chrono::Utc;
@@ -40,7 +39,7 @@ async fn google_login(
         // google user found; find related user
         Some(guser) => {
             let user = guser.find_related_user(&state.db).await?;
-            login(&state.db, session, &user, StatusCode::OK).await
+            login(&state, session, &user, StatusCode::OK).await
         }
         // no user found; create one
         None => {
@@ -67,7 +66,7 @@ async fn google_login(
                 avatar_url: payload.picture.clone(),
                 created: now.naive_local(),
             };
-            let res = login(&state.db, session, &user, StatusCode::CREATED).await?;
+            let res = login(&state, session, &user, StatusCode::CREATED).await?;
             user.insert(&state.db).await?;
 
             Ok(res)
@@ -76,11 +75,14 @@ async fn google_login(
 }
 
 async fn session(
-    session: Session,
+    mut session: Session,
     State(state): State<AppState>,
 ) -> Result<Json<UserAvatar>, Error> {
     match session.get(&state.db).await? {
-        Some(s) => Ok(Json(UserAvatar::new(&s))),
+        Some(s) => {
+            session.update_expiration(&state).await?;
+            Ok(Json(UserAvatar::new(&s)))
+        }
         None => Err(not_found("Session not found")),
     }
 }

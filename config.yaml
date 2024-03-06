@@ -1,0 +1,3 @@
+session:
+  expiration: 7d
+  expired_clear_interval: 1m

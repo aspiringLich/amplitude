@@ -15,6 +15,8 @@ pub struct Format;
 struct Visitor<'a> {
     out: &'a mut String,
     db_statement: String,
+    rows_affected: u64,
+    rows_returned: u64,
 }
 
 impl<'a> Visitor<'a> {
@@ -22,11 +24,29 @@ impl<'a> Visitor<'a> {
         Self {
             out,
             db_statement: String::new(),
+            rows_affected: 0,
+            rows_returned: 0,
         }
     }
 }
 
 impl<'a> Visit for Visitor<'a> {
+    fn record_u64(&mut self, field: &Field, value: u64) {
+        let italic = nu_ansi_term::Style::new().italic().reset_before_style();
+        let dimmed = nu_ansi_term::Style::new().dimmed().reset_before_style();
+
+        let name = field.name();
+        match name {
+            "rows_affected" => self.rows_affected = value,
+            "rows_returned" => self.rows_returned = value,
+            _ => return,
+        }
+        self.out
+            .push_str(&italic.paint(format!("{}", name)).to_string());
+        self.out.push_str(&dimmed.paint("=").to_string());
+        self.out.push_str(&format!("{:?}\n", value));
+    }
+
     fn record_debug(&mut self, field: &Field, value: &dyn fmt::Debug) {
         let italic = nu_ansi_term::Style::new().italic().reset_before_style();
         let dimmed = nu_ansi_term::Style::new().dimmed().reset_before_style();
@@ -87,8 +107,14 @@ where
         .reset_before_style()
     };
     let Visitor {
-        out, db_statement, ..
+        out,
+        db_statement,
+        rows_affected,
+        rows_returned,
     } = visitor;
+    if rows_affected == 0 && rows_returned == 0 {
+        return Ok(());
+    }
 
     db_statement
         .chars()

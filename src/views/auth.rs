@@ -1,4 +1,4 @@
-use crate::views::session::Session;
+use crate::{app::AppState, views::session::Session};
 
 use super::{internal, Error};
 use axum::{
@@ -6,7 +6,6 @@ use axum::{
     response::{AppendHeaders, IntoResponse, Response},
 };
 use entity::user;
-use sea_orm::DatabaseConnection;
 use serde::Serialize;
 
 #[derive(Serialize)]
@@ -25,14 +24,14 @@ impl UserAvatar {
 }
 
 pub async fn login(
-    db: &DatabaseConnection,
+    state: &AppState,
     session: Session,
     user: &user::Model,
     code: StatusCode,
 ) -> Result<Response, Error> {
     Ok((
         code,
-        session.get_or_add(db, user.user_id).await?,
+        session.get_or_add(state, user.user_id).await?,
         AppendHeaders([(CONTENT_TYPE, "application/json")]),
         serde_json::to_string(&UserAvatar::new(user)).map_err(internal)?,
     )

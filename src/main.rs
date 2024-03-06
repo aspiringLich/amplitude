@@ -6,8 +6,8 @@
 use std::{env, fs, sync::Arc, time::Duration};
 
 use axum::Router;
-use sea_orm::{ConnectOptions, Database};
-use tokio::signal;
+use sea_orm::{ConnectOptions, Database, DatabaseConnection};
+use tokio::{signal, task::AbortHandle};
 use tracing::Level;
 use tracing_subscriber::{filter, layer::SubscriberExt, util::SubscriberInitExt};
 
@@ -59,6 +59,8 @@ async fn main() -> eyre::Result<()> {
     };
     tracing::info!("Connected to database at `{}`", &url);
 
+    let expired_clear_interval = config.session.expired_clear_interval;
+
     let router: Router<_> = routes::routes();
     let state = AppState {
         config,
@@ -72,17 +74,30 @@ async fn main() -> eyre::Result<()> {
 
     tracing::info!("Listening on `localhost:3000`");
 
+    let mut interval = tokio::time::interval(expired_clear_interval);
+    let db_ = db.clone();
+    let handle = tokio::task::spawn(async move {
+        loop {
+            interval.tick().await;
+            match entity::session::Model::delete_expired(&db_).await {
+                Ok(n) if n > 0 => tracing::trace!("Deleted {} expired sessions", n),
+                Ok(_) => (),
+                Err(e) => tracing::error!("Failed to delete expired sessions: {e}"),
+            }
+        }
+    });
+
     axum::serve(listener, router)
-        .with_graceful_shutdown(shutdown_signal())
+        .with_graceful_shutdown(shutdown_signal(handle.abort_handle(), db))
         .await?;
-    db.close().await?;
+
     tracing::info!("Done!");
 
     Ok(())
 }
 
 /// stolen from https://github.com/maxcountryman/tower-sessions-stores/blob/main/sqlx-store/README.md
-async fn shutdown_signal() {
+async fn shutdown_signal(abort: AbortHandle, db: DatabaseConnection) {
     let ctrl_c = async {
         signal::ctrl_c()
             .await
@@ -100,11 +115,15 @@ async fn shutdown_signal() {
     let terminate = std::future::pending::<()>();
 
     tokio::select! {
-    _ = ctrl_c => {
+        _ = ctrl_c => {
             tracing::info!("Ctrl-C! Shutting down...");
+            abort.abort();
+            db.close().await.expect("Failed to close database connection");
         },
         _ = terminate => {
             tracing::info!("Terminate! Shutting down...");
+            abort.abort();
+            db.close().await.expect("Failed to close database connection");
         },
     }
 }

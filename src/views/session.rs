@@ -1,16 +1,18 @@
 use axum::extract::FromRequestParts;
 use axum_extra::extract::{cookie::Cookie, CookieJar};
-use chrono::Utc;
+use chrono::{NaiveDateTime, Utc};
 use entity::{session, user};
-use sea_orm::{DatabaseConnection, DbErr};
-use std::time::Duration;
+use sea_orm::{ActiveModelTrait, DatabaseConnection, DbErr, IntoActiveModel, Set};
 use uuid::{NoContext, Timestamp, Uuid};
+
+use crate::app::AppState;
 
 use super::internal;
 
 pub struct Session {
     session_id: Option<Uuid>,
     jar: CookieJar,
+    session: Option<session::Model>,
 }
 
 #[axum::async_trait]
@@ -27,40 +29,55 @@ impl<S> FromRequestParts<S> for Session {
         let session_id = jar
             .get("session")
             .and_then(|s| s.value().parse::<Uuid>().ok());
-        Ok(Self { session_id, jar })
+        Ok(Self {
+            session_id,
+            jar,
+            session: None,
+        })
     }
 }
 
+fn expiration(state: &AppState) -> NaiveDateTime {
+    Utc::now().naive_utc() + state.config.session.expiration
+}
+
 impl Session {
-    pub async fn get(&self, db: &DatabaseConnection) -> Result<Option<user::Model>, DbErr> {
-        let Some(session_id) = self.session_id else {
-            return Ok(None);
-        };
-        let session = session::Model::get(db, session_id).await?;
-        match session {
+    async fn session(&mut self, db: &DatabaseConnection) -> Result<Option<session::Model>, DbErr> {
+        match self.session.as_ref() {
+            Some(s) => Ok(Some(s.to_owned())),
+            None => {
+                let Some(session_id) = self.session_id else {
+                    return Ok(None);
+                };
+                let s = session::Model::get(db, session_id).await?;
+                self.session = s.clone();
+                Ok(s)
+            }
+        }
+    }
+
+    pub async fn get(&mut self, db: &DatabaseConnection) -> Result<Option<user::Model>, DbErr> {
+        match self.session(db).await? {
             Some(session) => Ok(Some(session.find_related_user(db).await?)),
             None => Ok(None),
         }
     }
 
     #[must_use]
-    pub async fn add(
-        self,
-        db: &DatabaseConnection,
-        user_id: Uuid,
-    ) -> Result<CookieJar, super::Error> {
+    pub async fn add(self, state: &AppState, user_id: Uuid) -> Result<CookieJar, super::Error> {
         let now = Utc::now();
         let secs = now.timestamp() as u64;
         let nanos = now.timestamp_subsec_nanos();
         let session_id = Uuid::new_v7(Timestamp::from_unix(NoContext, secs, nanos));
 
-        tracing::trace!("Adding session: {}", session_id);
+        let expiration = expiration(state);
+        tracing::trace!(id = ?session_id, expiration = ?expiration, "Adding session");
         session::Model {
             session_id,
             user_id,
-            expiration: now.naive_local() + Duration::from_secs(60 * 60 * 24 * 7),
+            expiration,
         }
-        .insert(db)
+        .insert(&state.db)
         .await?;
 
         let mut cookie = Cookie::new("session", session_id.as_simple().to_string());
@@ -72,13 +89,26 @@ impl Session {
 
     #[must_use]
     pub async fn get_or_add(
-        self,
-        db: &DatabaseConnection,
+        mut self,
+        state: &AppState,
         user_id: Uuid,
     ) -> Result<CookieJar, super::Error> {
-        match self.get(db).await? {
+        match self.get(&state.db).await? {
             Some(_) => Ok(self.jar),
-            None => self.add(db, user_id).await,
+            None => self.add(state, user_id).await,
         }
+    }
+
+    pub async fn update_expiration(&mut self, state: &AppState) -> Result<(), DbErr> {
+        let Some(session) = self.session(&state.db).await? else {
+            return Ok(());
+        };
+        let mut active = session.into_active_model();
+        let new_expiration = expiration(state);
+        tracing::trace!("Updated session expiration: {new_expiration}");
+
+        active.expiration = Set(new_expiration);
+        active.update(&state.db).await?;
+        Ok(())
     }
 }

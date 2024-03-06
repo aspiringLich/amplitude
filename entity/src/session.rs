@@ -51,4 +51,12 @@ impl Model {
             Err(e) => Err(e),
         }
     }
+
+    pub async fn delete_expired(db: &DatabaseConnection) -> Result<u64, DbErr> {
+        Entity::delete_many()
+            .filter(Column::Expiration.lt(chrono::Utc::now().naive_utc()))
+            .exec(db)
+            .await
+            .map(|r| r.rows_affected)
+    }
 }
