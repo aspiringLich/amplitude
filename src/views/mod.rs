@@ -2,6 +2,7 @@ use axum::{http::StatusCode, response::IntoResponse};
 use std::fmt::Display;
 
 pub mod auth;
+pub mod session;
 
 macro response($status:ident, $res:ident) {
     /// Return a response with the status code

@@ -1,4 +1,4 @@
-use crate::routes::Session;
+use crate::views::session::Session;
 
 use super::{internal, Error};
 use axum::{
