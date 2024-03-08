@@ -12,16 +12,18 @@
 			$account = data.avatar;
 		}
 	});
+
+	const sidebar = ['create'];
+	$: root = data.url.pathname.split('/')[1];
 </script>
 
 <div class="flex h-screen w-screen flex-row overflow-hidden">
 	<aside
-		id="sidebar"
-		class="flex min-w-48 max-w-48 flex-col items-stretch
-		justify-between bg-zinc-800 p-4 text-white"
+		class="flex min-w-52 max-w-52 flex-col items-stretch justify-between
+		space-y-6 bg-zinc-800 py-4 text-white"
 	>
-		<div class="relative h-20 w-full">
-			<div class="absolute flex w-full justify-around">
+		<div class="relative box-border h-20 w-full">
+			<div class="absolute box-border flex w-full justify-around px-4">
 				<div id="wave" />
 				<div id="wave" />
 				<div id="wave" />
@@ -35,14 +37,24 @@
 				<div />
 			</div>
 			<a
-				class="absolute flex h-full w-full select-none
+				class="sidebar absolute flex h-full w-full select-none
 				items-center justify-center text-center text-3xl font-bold italic"
 				href="/"
 			>
 				amplitude
 			</a>
 		</div>
-		<div class="grow"></div>
+		<nav class="sidebar grow px-2">
+			{#each sidebar as item}
+				<a
+					href="/{item}"
+					class="nav px-2"
+					class:highlight={root === item}
+				>
+					{item}
+				</a>
+			{/each}
+		</nav>
 		{#if data.avatar}
 			<AvatarSection name={data.avatar.name} src={data.avatar.avatar_url} />
 		{:else}
@@ -57,6 +69,24 @@
 </div>
 
 <style lang="postcss">
+	.nav.highlight {
+		@apply bg-zinc-700 text-white;
+	}
+
+	.nav {
+		@apply block rounded-full;
+		@apply text-muted text-right text-2xl font-extrabold capitalize italic;
+		@apply transition-colors;
+	}
+
+	.nav:hover {
+		@apply text-white;
+	}
+
+	.sidebar {
+		font-family: 'Inter', sans-serif;
+	}
+
 	#wave {
 		@apply h-3.5 w-3.5 rounded-full bg-opacity-50;
 		animation:
