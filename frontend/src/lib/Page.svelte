@@ -8,8 +8,8 @@
 
 <main class="h-full w-full" class:center>
 	<div
-		in:fly={{ y: -5, duration: 400, delay: 400 }}
-		out:fly={{ y: 5, duration: 400 }}
+		in:fly={{ y: -5, duration: 300, delay: 300 }}
+		out:fly={{ y: 5, duration: 300 }}
 		class={_class}
 	>
 		<slot />

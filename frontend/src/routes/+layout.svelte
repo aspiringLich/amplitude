@@ -1,3 +1,11 @@
+<script lang="ts" context="module">
+	let root_element: HTMLElement;
+	
+	export const refresh = () => {
+		root_element.dispatchEvent(new Event('refresh'));
+	};
+</script>
+
 <script lang="ts">
 	import '../styles/app.css';
 
@@ -6,18 +14,23 @@
 	import { account, logged_in } from './login';
 	import { onMount } from 'svelte';
 	import AvatarSection from './AvatarSection.svelte';
+	import { writable } from 'svelte/store';
 
+	let notify = writable<Event | undefined>(undefined);
 	onMount(async () => {
 		if (!$logged_in && data.avatar) {
 			$account = data.avatar;
 		}
+		root_element.addEventListener('refresh', (e) => {
+			notify.set(e);
+		});
 	});
 
 	const sidebar = ['create'];
 	$: root = data.url.pathname.split('/')[1];
 </script>
 
-<div class="flex h-screen w-screen flex-row overflow-hidden">
+<div class="flex h-screen w-screen flex-row overflow-hidden" bind:this={root_element}>
 	<aside
 		class="flex min-w-52 max-w-52 flex-col items-stretch justify-between
 		space-y-6 bg-zinc-800 py-4 text-white"
@@ -46,11 +59,7 @@
 		</div>
 		<nav class="sidebar grow px-2">
 			{#each sidebar as item}
-				<a
-					href="/{item}"
-					class="nav px-2"
-					class:highlight={root === item}
-				>
+				<a href="/{item}" class="nav px-2" class:highlight={root === item}>
 					{item}
 				</a>
 			{/each}
@@ -62,7 +71,7 @@
 		{/if}
 	</aside>
 	<div class="h-full w-full bg-zinc-200">
-		{#key data.url}
+		{#key data.url || $notify}
 			<slot />
 		{/key}
 	</div>
