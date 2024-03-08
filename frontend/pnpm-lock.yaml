@@ -44,7 +44,7 @@ devDependencies:
     specifier: ^20.11.20
     version: 20.11.20
   autoprefixer:
-    specifier: ^10.4.16
+    specifier: ^10.4.17
     version: 10.4.17(postcss@8.4.35)
   dotenv:
     specifier: ^16.4.5
@@ -53,7 +53,7 @@ devDependencies:
     specifier: ^0.0.2
     version: 0.0.2
   postcss:
-    specifier: ^8.4.32
+    specifier: ^8.4.35
     version: 8.4.35
   postcss-load-config:
     specifier: ^5.0.2
@@ -74,7 +74,7 @@ devDependencies:
     specifier: ^3.6.0
     version: 3.6.4(postcss-load-config@5.0.3)(postcss@8.4.35)(svelte@4.2.12)
   tailwindcss:
-    specifier: ^3.3.6
+    specifier: ^3.4.1
     version: 3.4.1
   tslib:
     specifier: ^2.4.1

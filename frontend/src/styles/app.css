@@ -6,14 +6,6 @@
 	.content {
 		@apply w-full flex-none md:w-[36rem];
 	}
-
-	.box {
-		@apply bg-white drop-shadow rounded-sm;
-	}
-
-	.box .title {
-		@apply mb-4 line-clamp-1 block bg-zinc-800 p-2 text-2xl text-white;
-	}	
 }
 
 

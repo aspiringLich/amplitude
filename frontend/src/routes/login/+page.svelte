@@ -6,6 +6,7 @@
 
 	import { goto, afterNavigate } from '$app/navigation';
 	import { base } from '$app/paths';
+	import Card from '$cpt/ui/Card.svelte';
 
 	let previousPage: string = base;
 	afterNavigate(({ from }) => {
@@ -24,41 +25,47 @@
 	};
 </script>
 
-<Page class="content box" center>
-	<span class="title">Log In to Amplitude</span>
-	<div class="login mb-4">
-		<script src="https://accounts.google.com/gsi/client" async defer></script>
-		{#if !$logged_in}
+<Page center>
+	<Card>
+		<header>
+			<h1>Log In to Amplitude</h1>
+		</header>
+		<section class="login">
+			<script src="https://accounts.google.com/gsi/client" async defer></script>
+			{#if !$logged_in}
+				<div
+					id="g_id_onload"
+					data-client_id={PUBLIC_GOOGLE_CLIENT_ID}
+					data-context="signin"
+					data-ux_mode="popup"
+					data-callback="login_google"
+					data-auto_select="true"
+					data-itp_support="true"
+				/>
+			{:else}
+				<div
+					id="g_id_onload"
+					data-client_id={PUBLIC_GOOGLE_CLIENT_ID}
+					data-callback="login_google"
+					data-auto_prompt="false"
+				/>
+			{/if}
+
 			<div
-				id="g_id_onload"
-				data-client_id={PUBLIC_GOOGLE_CLIENT_ID}
-				data-context="signin"
-				data-ux_mode="popup"
-				data-callback="login_google"
-				data-auto_select="true"
-				data-itp_support="true"
+				class="g_id_signin"
+				data-type="standard"
+				data-shape="pill"
+				data-theme="filled_black"
+				data-text="signin_with"
+				data-size="large"
+				data-logo_alignment="left"
 			/>
-		{:else}
-			<div
-				id="g_id_onload"
-				data-client_id={PUBLIC_GOOGLE_CLIENT_ID}
-				data-callback="login_google"
-			/>
-		{/if}
-		<div
-			class="g_id_signin"
-			data-type="standard"
-			data-shape="pill"
-			data-theme="filled_black"
-			data-text="signin_with"
-			data-size="large"
-			data-logo_alignment="left"
-		/>
-	</div>
+		</section>
+	</Card>
 </Page>
 
 <style lang="postcss">
 	.login {
-		@apply flex h-10 w-full items-center justify-center;
+		@apply flex h-10 w-96 items-center justify-center;
 	}
 </style>
