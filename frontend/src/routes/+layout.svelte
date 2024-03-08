@@ -49,11 +49,11 @@
 			<AvatarSection name={$account.name} src={$account.avatar_url} />
 		{/if}
 	</aside>
-	<main class="flex h-full w-full items-center justify-center bg-zinc-200">
+	<div class="h-full w-full bg-zinc-200">
 		{#key data.url}
 			<slot />
 		{/key}
-	</main>
+	</div>
 </div>
 
 <style lang="postcss">

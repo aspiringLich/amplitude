@@ -24,9 +24,9 @@
 	};
 </script>
 
-<Page class="content box">
+<Page class="content box" center>
 	<span class="title">Log In to Amplitude</span>
-	<div class="login">
+	<div class="login mb-4">
 		<script src="https://accounts.google.com/gsi/client" async defer></script>
 		{#if !$logged_in}
 			<div

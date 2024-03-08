@@ -13,7 +13,7 @@
 	}
 
 	.box {
-		@apply bg-white pb-4;
+		@apply bg-white drop-shadow rounded-sm;
 	}
 
 	.box .title {
