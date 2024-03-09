@@ -20,7 +20,7 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.375rem;
-		padding: 1.5rem;
+		padding: 1rem 1.5rem;
 	}
 
 	.card > :global(header > h1) {
@@ -36,14 +36,14 @@
 	}
 
 	.card > :global(section) {
-		padding: 1.5rem;
+		padding: 1rem 1.5rem;
 		padding-top: 0;
 	}
 
 	.card > :global(footer) {
 		display: flex;
 		align-items: center;
-		padding: 1.5rem;
+		padding: 1rem 1.5rem;
 		padding-top: 0;
 	}
 	/* .card :global(header) {

@@ -59,7 +59,7 @@
 		</div>
 		<nav class="sidebar grow px-2">
 			{#each sidebar as item}
-				<a href="/{item}" class="nav px-2" class:highlight={root === item}>
+				<a href="/{item}" class="nav pr-2" class:highlight={root === item}>
 					{item}
 				</a>
 			{/each}

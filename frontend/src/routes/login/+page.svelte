@@ -9,8 +9,11 @@
 	import Card from '$cpt/ui/Card.svelte';
 
 	let previousPage: string = base;
+	let disable = false;
 	afterNavigate(({ from }) => {
+		if (disable) return;
 		previousPage = from?.url?.pathname || previousPage;
+		disable = true;
 	});
 
 	type GoogleUser = { client_id: string; credential: string; select_by: string };
@@ -66,6 +69,6 @@
 
 <style lang="postcss">
 	.login {
-		@apply flex h-10 w-96 items-center justify-center;
+		@apply flex h-20 w-96 items-center justify-center;
 	}
 </style>

@@ -14,8 +14,13 @@
 <script lang="ts">
 	import Page from '$lib/Page.svelte';
 	import ChooseDraft from '$src/routes/create/ChooseDraft.svelte';
+	import { refresh } from '$src/routes/+layout.svelte';
 
 	let open = $state.open;
+
+	state.subscribe((s) => {
+		if (s.open !== open) refresh();
+	});
 </script>
 
 <Page center>
