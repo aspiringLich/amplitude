@@ -3,13 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-	.content {
-		@apply w-full flex-none md:w-[36rem];
-	}
-}
-
-
-@layer base {
 	:root {
 		--background: 0 0% 100%;
 		--foreground: 222.2 84% 4.9%;

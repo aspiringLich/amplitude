@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
 	let root_element: HTMLElement;
-	
+
 	export const refresh = () => {
 		root_element.dispatchEvent(new Event('refresh'));
 	};
@@ -8,6 +8,7 @@
 
 <script lang="ts">
 	import '../styles/app.css';
+	import '../styles/splitter.css';
 
 	export let data;
 
@@ -16,7 +17,8 @@
 	import AvatarSection from './AvatarSection.svelte';
 	import { writable } from 'svelte/store';
 
-	let notify = writable<Event | undefined>(undefined);
+	let notify = writable<Event | undefined | null>(undefined);
+	let init = false;
 	onMount(async () => {
 		if (!$logged_in && data.avatar) {
 			$account = data.avatar;
@@ -24,6 +26,7 @@
 		root_element.addEventListener('refresh', (e) => {
 			notify.set(e);
 		});
+		init = true;
 	});
 
 	const sidebar = ['create'];
@@ -70,10 +73,12 @@
 			<AvatarSection name={$account.name} src={$account.avatar_url} />
 		{/if}
 	</aside>
-	<div class="h-full w-full bg-zinc-200">
-		{#key data.url || $notify}
-			<slot />
-		{/key}
+	<div class="content h-full w-full bg-zinc-200">
+		{#if init}
+			{#key data.url || $notify}
+				<slot />
+			{/key}
+		{/if}
 	</div>
 </div>
 
