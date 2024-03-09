@@ -8,7 +8,6 @@
 </script>
 
 <script lang="ts">
-	import Card from '$cpt/ui/Card.svelte';
 	import { Button } from '$cpt/ui/button';
 	import * as Table from '$cpt/ui/table';
 	import * as Tooltip from '$cpt/ui/tooltip';
@@ -42,7 +41,7 @@
 </script>
 
 <Page center>
-	<Card class="m-4">
+	<div class="card m-4">
 		<header>
 			<h1>Exercise Drafts</h1>
 		</header>
@@ -89,7 +88,7 @@
 									e.stopImmediatePropagation();
 									delete_draft(i);
 								}}
-								class="mr-4"
+								class="mr-6"
 								variant="line-destructive"
 								size="icon-sm"
 							>
@@ -107,5 +106,5 @@
 				</Table.Body>
 			</Table.Root>
 		</section>
-	</Card>
+	</div>
 </Page>

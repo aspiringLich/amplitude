@@ -9,12 +9,14 @@
 </script>
 
 <Page class="h-full">
-	<Splitpanes class="h-full w-full" theme="custom-theme">
-		<Pane size={50} minSize={20}>
-			<a href="/create">
-				<Button>Back</Button>
-			</a>
+	<Splitpanes class="" theme="custom-theme">
+		<Pane size={50} minSize={20} class="p-2 pr-0">
+			<div class="card h-full">
+                
+            </div>
 		</Pane>
-		<Pane size={50} minSize={20}>hell yeah</Pane>
+		<Pane size={50} minSize={20} class="p-2 pl-0">
+			<div class="card h-full"></div>
+		</Pane>
 	</Splitpanes>
 </Page>

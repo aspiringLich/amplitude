@@ -9,6 +9,7 @@
 <script lang="ts">
 	import '../styles/app.css';
 	import '../styles/splitter.css';
+	import '../styles/card.css';
 
 	export let data;
 

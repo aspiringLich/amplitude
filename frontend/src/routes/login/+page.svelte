@@ -6,7 +6,6 @@
 
 	import { goto, afterNavigate } from '$app/navigation';
 	import { base } from '$app/paths';
-	import Card from '$cpt/ui/Card.svelte';
 
 	let previousPage: string = base;
 	let disable = false;
@@ -29,7 +28,7 @@
 </script>
 
 <Page center>
-	<Card>
+	<div class="card">
 		<header>
 			<h1>Log In to Amplitude</h1>
 		</header>
@@ -64,7 +63,7 @@
 				data-logo_alignment="left"
 			/>
 		</section>
-	</Card>
+	</div>
 </Page>
 
 <style lang="postcss">
