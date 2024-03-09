@@ -4,9 +4,30 @@
 	import * as Table from '$cpt/ui/table';
 	import * as Tooltip from '$cpt/ui/tooltip';
 
-	import { state, ex_drafts } from '$src/routes/create/+page.svelte';
-	import { refresh } from '$src/routes/+layout.svelte';
-	import { Plus } from 'lucide-svelte';
+	import { state, drafts } from '$src/routes/create/+page.svelte';
+	import { Plus, Trash2 } from 'lucide-svelte';
+
+	let _drafts = $drafts;
+
+	const create_draft = () => {
+		drafts.update((e) => {
+			e.push({ name: 'Untitled Exercise' });
+			return e;
+		});
+		$state.open = $drafts.length - 1;
+	};
+
+	const delete_draft = (i: number) => {
+		drafts.update((e) => {
+			e.splice(i, 1);
+			return e;
+		});
+		_drafts = $drafts;
+	};
+
+	const select_draft = (i: number) => {
+		$state.open = i;
+	};
 </script>
 
 <Card class="m-4">
@@ -24,27 +45,47 @@
 					<Table.Head class="flex items-center justify-between">
 						Your Drafts
 						<Tooltip.Root>
-							<Tooltip.Trigger asChild let:builder>
-								<Button builders={[builder]} class="rounded-full" variant="outline" size="icon">
-									<Plus class="h-4 w-4" />
-								</Button>
-							</Tooltip.Trigger>
-							<Tooltip.Content>Create a new draft</Tooltip.Content>
+							<Button
+								on:click={create_draft}
+								class="rounded-full"
+								variant="outline"
+								size="icon"
+								tooltip="Create a new draft"
+							>
+								<Plus class="h-4 w-4" />
+							</Button>
 						</Tooltip.Root>
 					</Table.Head>
 				</Table.Row>
 			</Table.Header>
 			<Table.Body>
-				{#each $ex_drafts as ex}
+				{#each _drafts as ex, i}
+					<Table.Row
+						on:click={() => select_draft(i)}
+						class="hover:bg-muted/50 flex items-center justify-between"
+					>
+						<Table.Cell class="relative">
+							{ex.name}
+						</Table.Cell>
+						<Button
+							on:click={(e) => {
+								e.stopImmediatePropagation();
+								delete_draft(i);
+							}}
+							class="mr-4"
+							variant="line-destructive"
+							size="icon-sm"
+						>
+							<Trash2 class="h-4 w-4" />
+						</Button>
+					</Table.Row>
+				{:else}
 					<Table.Row>
-						<Table.Cell>{ex.name}</Table.Cell>
+						<Table.Cell class="text-muted-foreground italic" colspan={2}>
+							No drafts found
+						</Table.Cell>
 					</Table.Row>
 				{/each}
-				{#if $ex_drafts.length === 0}
-					<Table.Row>
-						<Table.Cell class="italic" colspan={2}>No drafts found</Table.Cell>
-					</Table.Row>
-				{/if}
 			</Table.Body>
 		</Table.Root>
 	</section>

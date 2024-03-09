@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export type Exercise = {
+export type ExerciseDraft = {
 	name: string;
 	description?: string;
 	generator?: string;
