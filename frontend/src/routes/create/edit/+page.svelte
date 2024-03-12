@@ -8,14 +8,14 @@
 	let exercise = $drafts[$selected_draft];
 </script>
 
-<Page class="h-full">
-	<Splitpanes class="" theme="custom-theme">
-		<Pane size={50} minSize={20} class="p-2 pr-0">
-			<div class="card h-full">
-                
-            </div>
+<Page center class="max-w-4xl grow">
+	<Splitpanes class="h-min w-full items-stretch" theme="custom-theme">
+		<Pane size={50} minSize={20} class="!h-auto p-2 pr-0">
+			<div class="card prose max-w-full">
+				<section>yep</section>
+			</div>
 		</Pane>
-		<Pane size={50} minSize={20} class="p-2 pl-0">
+		<Pane size={50} minSize={20} class="!h-auto p-2 pl-0">
 			<div class="card h-full"></div>
 		</Pane>
 	</Splitpanes>
