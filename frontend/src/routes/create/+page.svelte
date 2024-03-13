@@ -1,10 +1,10 @@
 <script lang="ts" context="module">
 	import { type Writable } from 'svelte/store';
 	import { local_store } from '$src/lib/local_store';
-	import type { ExerciseDraft } from '$src/routes/create/schema';
+	import type { Exercise } from '$src/routes/create/schema';
 
 	export const selected_draft: Writable<number> = local_store('create/selected_draft', -1);
-	export const drafts: Writable<ExerciseDraft[]> = local_store('create/drafts', []);
+	export const drafts: Writable<Exercise[]> = local_store('create/drafts', []);
 </script>
 
 <script lang="ts">
@@ -20,7 +20,12 @@
 
 	const create_draft = () => {
 		drafts.update((e) => {
-			e.push({ name: 'Untitled Exercise' });
+			e.push({
+				title: 'Untitled Exercise',
+				description: '',
+				generator: '',
+				starting_code: '',
+			});
 			return e;
 		});
 		$selected_draft = $drafts.length - 1;
@@ -80,7 +85,7 @@
 								on:click={() => select_draft(i)}
 							>
 								<Table.Cell class="relative w-full">
-									{ex.name}
+									{ex?.title}
 								</Table.Cell>
 							</a>
 							<Button
