@@ -10,6 +10,8 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { debounce } from '@melt-ui/svelte/internal/helpers';
 	import { superForm } from 'sveltekit-superforms';
+	import { CornerUpRight } from 'lucide-svelte';
+	import Editor from '$src/lib/components/editor/Editor.svelte';
 
 	let selected = $selected_draft;
 	let exercise = $drafts[selected];
@@ -25,6 +27,10 @@
 	const { form: data, enhance } = form;
 
 	let selected_field: string | null = null;
+
+	const select = (field: string) => {
+		selected_field = field;
+	};
 </script>
 
 <Page center class="max-w-4xl grow">
@@ -44,6 +50,21 @@
 							</Form.Control>
 							<Form.FieldErrors />
 						</Form.Field>
+						<Form.Field {form} name="description">
+							<Form.Control let:attrs>
+								<Form.Label>Description</Form.Label>
+								<Input {...attrs} type="hidden" />
+								<Button
+									class="block"
+									on:click={() => select('description')}
+									size="sm"
+									variant="default"
+								>
+									Edit <CornerUpRight class="mb-0.5 inline-block h-4 w-4" />
+								</Button>
+							</Form.Control>
+							<Form.FieldErrors />
+						</Form.Field>
 					</form>
 				</section>
 			</div>
@@ -51,11 +72,15 @@
 		<Pane size={50} minSize={20} class="!h-auto pr-2">
 			<div class="card h-full">
 				{#if selected_field}
-					<!--  -->
+					{#if selected_field === 'description'}
+						<Editor lang="md" bind:value={$data.description} />
+					{:else}
+						Selected an invalid field. This is a bug.
+					{/if}
 				{:else}
 					<div
-						class="text-muted-foreground h-full w-full rounded-lg bg-zinc-100
-						flex items-center justify-center italic select-none"
+						class="text-muted-foreground flex h-full w-full select-none
+						items-center justify-center rounded-lg bg-zinc-100 italic"
 					>
 						<span>No Field Selected</span>
 					</div>
