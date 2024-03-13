@@ -30,7 +30,7 @@
 		init = true;
 	});
 
-	const sidebar = ['create'];
+	const sidebar = ['create', 'edit'];
 	$: root = data.url.pathname.split('/')[1];
 </script>
 

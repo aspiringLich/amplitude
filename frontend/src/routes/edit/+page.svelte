@@ -1,12 +1,12 @@
-<script>
-	import { drafts, selected_draft } from '../+page.svelte';
+<script lang="ts">
+	import { drafts, selected_draft } from '../create/+page.svelte';
 	import Page from '$src/lib/Page.svelte';
 	import * as Form from '$lib/components/ui/form';
 	import { Pane, Splitpanes } from 'svelte-splitpanes';
 	import { Button } from '$src/lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 
-	import { exerciseSchema } from '$src/routes/create/schema';
+	import { exerciseSchema } from './schema';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { debounce } from '@melt-ui/svelte/internal/helpers';
 	import { superForm } from 'sveltekit-superforms';
@@ -23,6 +23,8 @@
 		onChange: debounce(update, 500)
 	});
 	const { form: data, enhance } = form;
+
+	let selected_field: string | null = null;
 </script>
 
 <Page center class="max-w-4xl grow">
@@ -47,7 +49,18 @@
 			</div>
 		</Pane>
 		<Pane size={50} minSize={20} class="!h-auto pr-2">
-			<div class="card h-full"></div>
+			<div class="card h-full">
+				{#if selected_field}
+					<!--  -->
+				{:else}
+					<div
+						class="text-muted-foreground h-full w-full rounded-lg bg-zinc-100
+						flex items-center justify-center italic select-none"
+					>
+						<span>No Field Selected</span>
+					</div>
+				{/if}
+			</div>
 		</Pane>
 	</Splitpanes>
 </Page>

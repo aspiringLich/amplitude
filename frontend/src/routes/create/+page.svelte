@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
 	import { type Writable } from 'svelte/store';
 	import { local_store } from '$src/lib/local_store';
-	import type { Exercise } from '$src/routes/create/schema';
+	import type { Exercise } from '$src/routes/edit/schema';
 
 	export const selected_draft: Writable<number> = local_store('create/selected_draft', -1);
 	export const drafts: Writable<Exercise[]> = local_store('create/drafts', []);
@@ -81,7 +81,7 @@
 						<Table.Row class="hover:bg-muted/50 flex items-center justify-between">
 							<a
 								class="block w-full no-underline"
-								href="/create/edit"
+								href="/edit"
 								on:click={() => select_draft(i)}
 							>
 								<Table.Cell class="relative w-full">
