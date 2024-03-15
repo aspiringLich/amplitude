@@ -29,7 +29,7 @@
 }
 .custom-theme.splitpanes--vertical > .splitpanes__splitter,
 .custom-theme .splitpanes--vertical > .splitpanes__splitter {
-	width: 7px;
+	width: 4px;
 	/* border-left: 1px solid #eee; */
 	cursor: col-resize;
 }

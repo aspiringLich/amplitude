@@ -4,7 +4,8 @@
 	import type { Exercise } from '$src/routes/edit/schema';
 
 	export const selected_draft: Writable<number> = local_store('create/selected_draft', -1);
-	export const drafts: Writable<Exercise[]> = local_store('create/drafts', []);
+	export type ExerciseDraft = Exercise & { selected_field?: string };
+	export const drafts: Writable<ExerciseDraft[]> = local_store('create/drafts', []);
 </script>
 
 <script lang="ts">

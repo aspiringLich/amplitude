@@ -12,6 +12,7 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { CornerUpRight } from 'lucide-svelte';
 	import Editor from '$src/lib/components/editor/Editor.svelte';
+	import RichEditor from '$src/lib/components/editor/RichEditor.svelte';
 
 	let selected = $selected_draft;
 	let exercise = $drafts[selected];
@@ -26,17 +27,15 @@
 	});
 	const { form: data, enhance } = form;
 
-	let selected_field: string | null = null;
-
 	const select = (field: string) => {
-		selected_field = field;
+		exercise.selected_field = field;
 	};
 </script>
 
 <Page center class="max-w-4xl grow">
 	<Splitpanes class="h-min w-full items-stretch" theme="custom-theme">
 		<Pane size={50} minSize={20} class="!h-auto pl-2">
-			<div class="card prose max-w-full">
+			<div class="card prose max-w-full h-full">
 				<header>
 					<h1>Edit Exercise</h1>
 					<span>Edit the exercise details below.</span>
@@ -71,9 +70,9 @@
 		</Pane>
 		<Pane size={50} minSize={20} class="!h-auto pr-2">
 			<div class="card h-full">
-				{#if selected_field}
-					{#if selected_field === 'description'}
-						<Editor lang="md" bind:value={$data.description} />
+				{#if exercise.selected_field}
+					{#if exercise.selected_field === 'description'}
+						<RichEditor />
 					{:else}
 						Selected an invalid field. This is a bug.
 					{/if}
