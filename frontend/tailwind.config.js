@@ -3,7 +3,7 @@ import { fontFamily } from 'tailwindcss/defaultTheme';
 /** @type {import('tailwindcss').Config} */
 const config = {
 	darkMode: ['class'],
-	content: ['./src/**/*.{html,js,svelte,ts}'],
+	content: ['./src/**/*.{html,js,svelte,ts,css}'],
 	safelist: ['dark'],
 	plugins: [require('@tailwindcss/typography')],
 	theme: {
@@ -15,6 +15,14 @@ const config = {
 			}
 		},
 		extend: {
+			typography: (theme) => ({
+				DEFAULT: {
+					css: {
+						'--tw-prose-bullets': '#000000',
+						'--tw-prose-pre-code': '#000000',
+					}
+				}
+			}),
 			colors: {
 				border: 'hsl(var(--border) / <alpha-value>)',
 				input: 'hsl(var(--input) / <alpha-value>)',
@@ -48,7 +56,7 @@ const config = {
 				card: {
 					DEFAULT: 'hsl(var(--card) / <alpha-value>)',
 					foreground: 'hsl(var(--card-foreground) / <alpha-value>)'
-				}
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

@@ -7,10 +7,10 @@
 </script>
 
 <script lang="ts">
+	import '../styles/prose.css';
 	import '../styles/app.css';
 	import '../styles/splitter.css';
 	import '../styles/card.css';
-	import '../styles/prose.css';
 
 	export let data;
 

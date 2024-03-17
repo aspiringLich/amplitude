@@ -91,6 +91,8 @@
 			},
 			content
 		});
+		const tiptap = element.querySelector('.tiptap');
+		tiptap?.classList.add('prose');
 	});
 	onDestroy(() => {
 		editor?.destroy();
@@ -197,47 +199,6 @@
 					<LinkIcon class="h-4 w-4" />
 				</Button>
 			{/if}
-			{#if width > 250}
-				<div class="m-1 h-full border border-zinc-100" />
-				<Button
-					variant={variant(editor.isActive('bulletList'))}
-					size="icon-xs"
-					title="Toggle Bullet List"
-					disabled={!can((c) => c.toggleBulletList()) ?? editor}
-					on:click={execute((c) => c.toggleBulletList())}
-				>
-					<ListIcon class="h-4 w-4" />
-				</Button>
-				<Button
-					variant={variant(editor.isActive('orderedList'))}
-					size="icon-xs"
-					title="Toggle Ordered List"
-					disabled={!can((c) => c.toggleOrderedList()) ?? editor}
-					on:click={execute((c) => c.toggleOrderedList())}
-				>
-					<ListOrderedIcon class="h-4 w-4" />
-				</Button>
-				{#if width > 300 && editor.isActive('listItem')}
-				<Button
-					variant="outline"
-					size="icon-xs"
-					title="Sink List Item"
-					disabled={!can((c) => c.sinkListItem('listItem')) ?? editor}
-					on:click={execute((c) => c.sinkListItem('listItem'))}
-				>
-					<ListCollapseIcon class="h-4 w-4" />
-				</Button>
-				<Button
-					variant="outline"
-					size="icon-xs"
-					title="Lift List Item"
-					disabled={!can((c) => c.liftListItem('listItem')) ?? editor}
-					on:click={execute((c) => c.liftListItem('listItem'))}
-				>
-					<ListEndIcon class="h-4 w-4" />
-				</Button>
-				{/if}
-			{/if}
 			<div class="m-1 h-full border border-zinc-100" />
 			<DropdownMenu.Root bind:open>
 				<DropdownMenu.Trigger asChild let:builder>
@@ -299,13 +260,54 @@
 					</DropdownMenu.Group>
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
+			{#if width > 250}
+				<div class="m-1 h-full border border-zinc-100" />
+				<Button
+					variant={variant(editor.isActive('bulletList'))}
+					size="icon-xs"
+					title="Toggle Bullet List"
+					disabled={!can((c) => c.toggleBulletList()) ?? editor}
+					on:click={execute((c) => c.toggleBulletList())}
+				>
+					<ListIcon class="h-4 w-4" />
+				</Button>
+				<Button
+					variant={variant(editor.isActive('orderedList'))}
+					size="icon-xs"
+					title="Toggle Ordered List"
+					disabled={!can((c) => c.toggleOrderedList()) ?? editor}
+					on:click={execute((c) => c.toggleOrderedList())}
+				>
+					<ListOrderedIcon class="h-4 w-4" />
+				</Button>
+				{#if width > 300 && editor.isActive('listItem')}
+				<Button
+					variant="outline"
+					size="icon-xs"
+					title="Sink List Item"
+					disabled={!can((c) => c.sinkListItem('listItem')) ?? editor}
+					on:click={execute((c) => c.sinkListItem('listItem'))}
+				>
+					<ListCollapseIcon class="h-4 w-4" />
+				</Button>
+				<Button
+					variant="outline"
+					size="icon-xs"
+					title="Lift List Item"
+					disabled={!can((c) => c.liftListItem('listItem')) ?? editor}
+					on:click={execute((c) => c.liftListItem('listItem'))}
+				>
+					<ListEndIcon class="h-4 w-4" />
+				</Button>
+				{/if}
+			{/if}
 		{/if}
 	</div>
 </div>
 
 <style lang="postcss">
 	:global(.tiptap) {
-		@apply min-h-0 flex-[1_1_0] overflow-auto p-2;
 		@apply prose prose-sm max-w-none;
+		@apply min-h-0 flex-[1_1_0] overflow-auto p-2;
 	}
 </style>
