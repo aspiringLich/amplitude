@@ -1,0 +1,11 @@
+.tiptap :not(pre) code {
+	@apply rounded bg-zinc-100 p-0.5;
+}
+
+.tiptap pre {
+	@apply my-1 rounded bg-zinc-100 p-1;
+}
+
+.tiptap a {
+    @apply text-blue-500 underline cursor-pointer;
+}
