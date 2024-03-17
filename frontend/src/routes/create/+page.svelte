@@ -96,7 +96,7 @@
 								}}
 								class="mr-6"
 								variant="line-destructive"
-								size="icon-sm"
+								size="icon-xs"
 							>
 								<Trash2 class="h-4 w-4" />
 							</Button>
