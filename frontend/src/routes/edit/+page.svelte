@@ -11,7 +11,6 @@
 	import { debounce } from '@melt-ui/svelte/internal/helpers';
 	import { superForm } from 'sveltekit-superforms';
 	import { CornerUpRight } from 'lucide-svelte';
-	import Editor from '$src/lib/components/editor/Editor.svelte';
 	import RichEditor from '$src/lib/components/editor/RichEditor.svelte';
 
 	let selected = $selected_draft;
@@ -54,14 +53,15 @@
 						<Form.Field {form} name="description">
 							<Form.Control let:attrs>
 								<Form.Label>Description</Form.Label>
-								<Input {...attrs} type="hidden" />
+								<Input {...attrs} type="hidden" bind:value={$data.description} />
 								<Button
 									class="block"
 									on:click={() => select('description')}
 									size="sm"
 									variant="default"
 								>
-									Edit <CornerUpRight class="mb-0.5 inline-block h-4 w-4" />
+									<span>Edit</span>
+									<CornerUpRight class="inline-block h-4 w-4" />
 								</Button>
 							</Form.Control>
 							<Form.FieldErrors />
@@ -74,7 +74,7 @@
 			<div class="card h-full">
 				{#if $data.selected_field}
 					{#if $data.selected_field === 'description'}
-						<RichEditor />
+						<RichEditor bind:content={$data.description} />
 					{:else}
 						Selected an invalid field. This is a bug.
 					{/if}

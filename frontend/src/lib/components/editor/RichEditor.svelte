@@ -29,12 +29,19 @@
 	import History from '@tiptap/extension-history';
 
 	import { onMount, onDestroy } from 'svelte';
-	import { sleep } from '@melt-ui/svelte/internal/helpers';
-
+	import { debounce, sleep } from '@melt-ui/svelte/internal/helpers';
+	
+	export let content: string | undefined = undefined;
+	
 	let editor: Editor;
 	let element: HTMLElement;
-	let dropdown: HTMLElement;
 	let width: number;
+	
+	const update = debounce(() => {
+		if (editor) {
+			content = editor.getHTML();
+		}
+	}, 500);
 
 	onMount(() => {
 		editor = new Editor({
@@ -53,7 +60,9 @@
 			],
 			onTransaction: () => {
 				editor = editor;
-			}
+				update();
+			},
+			content,
 		});
 	});
 	onDestroy(() => {
