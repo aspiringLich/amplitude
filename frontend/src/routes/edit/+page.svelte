@@ -17,25 +17,27 @@
 	let selected = $selected_draft;
 	let exercise = $drafts[selected];
 
-	const update = () => {
+	const update = debounce(() => {
 		$drafts[selected] = $data;
-	};
+	}, 500);
 
 	const form = superForm(exercise, {
 		validators: zodClient(exerciseSchema),
-		onChange: debounce(update, 500)
+		onChange: update
 	});
 	const { form: data, enhance } = form;
 
 	const select = (field: string) => {
-		exercise.selected_field = field;
+		if ($data.selected_field === field) $data.selected_field = undefined;
+		else $data.selected_field = field;
+		update();
 	};
 </script>
 
 <Page center class="max-w-4xl grow">
 	<Splitpanes class="h-min w-full items-stretch" theme="custom-theme">
 		<Pane size={50} minSize={20} class="!h-auto pl-2">
-			<div class="card prose max-w-full h-full">
+			<div class="card prose h-full max-w-full">
 				<header>
 					<h1>Edit Exercise</h1>
 					<span>Edit the exercise details below.</span>
@@ -70,8 +72,8 @@
 		</Pane>
 		<Pane size={50} minSize={20} class="!h-auto pr-2">
 			<div class="card h-full">
-				{#if exercise.selected_field}
-					{#if exercise.selected_field === 'description'}
+				{#if $data.selected_field}
+					{#if $data.selected_field === 'description'}
 						<RichEditor />
 					{:else}
 						Selected an invalid field. This is a bug.
