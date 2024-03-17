@@ -19,7 +19,11 @@
 		CodeIcon,
 		FileCode2Icon,
 		Wand2Icon,
-		LinkIcon
+		LinkIcon,
+		ListIcon,
+		ListOrderedIcon,
+		ListEndIcon,
+		ListCollapseIcon,
 	} from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 
@@ -32,6 +36,9 @@
 	import Code from '@tiptap/extension-code';
 	import CodeBlockLowLight from '@tiptap/extension-code-block-lowlight';
 	import Link from '@tiptap/extension-link';
+	import OrderedList from '@tiptap/extension-ordered-list';
+	import BulletList from '@tiptap/extension-bullet-list';
+	import ListItem from '@tiptap/extension-list-item';
 	import DropCursor from '@tiptap/extension-dropcursor';
 	import GapCursor from '@tiptap/extension-gapcursor';
 	import History from '@tiptap/extension-history';
@@ -71,6 +78,9 @@
 						target: '_blank'
 					}
 				}),
+				OrderedList,
+				BulletList,
+				ListItem,
 				DropCursor,
 				GapCursor,
 				History
@@ -175,7 +185,7 @@
 				<Button
 					variant={variant(editor.isActive('link'))}
 					size="icon-xs"
-					title="Toggle Link Mark"
+					title="Unset Link Mark"
 					on:click={execute((c) =>
 						c
 							.insertContent(' ')
@@ -186,6 +196,47 @@
 				>
 					<LinkIcon class="h-4 w-4" />
 				</Button>
+			{/if}
+			{#if width > 250}
+				<div class="m-1 h-full border border-zinc-100" />
+				<Button
+					variant={variant(editor.isActive('bulletList'))}
+					size="icon-xs"
+					title="Toggle Bullet List"
+					disabled={!can((c) => c.toggleBulletList()) ?? editor}
+					on:click={execute((c) => c.toggleBulletList())}
+				>
+					<ListIcon class="h-4 w-4" />
+				</Button>
+				<Button
+					variant={variant(editor.isActive('orderedList'))}
+					size="icon-xs"
+					title="Toggle Ordered List"
+					disabled={!can((c) => c.toggleOrderedList()) ?? editor}
+					on:click={execute((c) => c.toggleOrderedList())}
+				>
+					<ListOrderedIcon class="h-4 w-4" />
+				</Button>
+				{#if width > 300 && editor.isActive('listItem')}
+				<Button
+					variant="outline"
+					size="icon-xs"
+					title="Sink List Item"
+					disabled={!can((c) => c.sinkListItem('listItem')) ?? editor}
+					on:click={execute((c) => c.sinkListItem('listItem'))}
+				>
+					<ListCollapseIcon class="h-4 w-4" />
+				</Button>
+				<Button
+					variant="outline"
+					size="icon-xs"
+					title="Lift List Item"
+					disabled={!can((c) => c.liftListItem('listItem')) ?? editor}
+					on:click={execute((c) => c.liftListItem('listItem'))}
+				>
+					<ListEndIcon class="h-4 w-4" />
+				</Button>
+				{/if}
 			{/if}
 			<div class="m-1 h-full border border-zinc-100" />
 			<DropdownMenu.Root bind:open>
