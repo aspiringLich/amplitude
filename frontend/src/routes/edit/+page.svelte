@@ -2,7 +2,6 @@
 	import { drafts, selected_draft } from '../create/+page.svelte';
 	import Page from '$src/lib/Page.svelte';
 	import * as Form from '$lib/components/ui/form';
-	import { Pane, Splitpanes } from 'svelte-splitpanes';
 	import { Button } from '$src/lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 
@@ -12,6 +11,7 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { CornerUpRight } from 'lucide-svelte';
 	import RichEditor from '$src/lib/components/editor/RichEditor.svelte';
+	import Editor from '$src/lib/components/editor/Editor.svelte';
 
 	let selected = $selected_draft;
 	let exercise = $drafts[selected];
@@ -61,7 +61,7 @@
 							<span>Edit</span>
 							<CornerUpRight class="ml-2 h-4 w-4" />
 						</Button>
-						
+
 						<h6 class="text-bold col-span-2 mt-2">Test Cases</h6>
 						<Form.Field {form} name="generator" class="flex items-center">
 							<Form.Control let:attrs>
@@ -96,8 +96,11 @@
 		</div>
 		<div class="card h-auto flex-grow">
 			{#if $data.selected_field}
-				{#if $data.selected_field === 'description'}
+				{@const s = $data.selected_field}
+				{#if s === 'description'}
 					<RichEditor bind:content={$data.description} />
+				{:else if s === 'generator'}
+					<Editor bind:value={$data.generator} />
 				{:else}
 					Selected an invalid field. This is a bug.
 				{/if}
