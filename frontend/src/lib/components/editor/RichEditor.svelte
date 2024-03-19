@@ -245,7 +245,7 @@
 						</DropdownMenu.Sub>
 						<DropdownMenu.Sub>
 							<DropdownMenu.SubTrigger>
-								<LinkIcon class="ww-4 mr-2 h-4" />
+								<LinkIcon class="mr-2 h-4 w-4" />
 								<span>Link</span>
 							</DropdownMenu.SubTrigger>
 							<DropdownMenu.SubContent class="w-60">

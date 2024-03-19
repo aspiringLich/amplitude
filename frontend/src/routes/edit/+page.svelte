@@ -34,59 +34,81 @@
 </script>
 
 <Page center class="max-w-4xl grow">
-	<Splitpanes class="h-min w-full items-stretch" theme="custom-theme">
-		<Pane size={50} minSize={20} class="!h-auto pl-2">
-			<div class="card prose h-full max-w-full">
-				<header>
-					<h1>Edit Exercise</h1>
-					<span>Edit the exercise details below.</span>
-				</header>
-				<section>
-					<form method="POST" use:enhance>
-						<Form.Field {form} name="title">
-							<Form.Control let:attrs>
-								<Form.Label>Title</Form.Label>
-								<Input {...attrs} bind:value={$data.title} />
-							</Form.Control>
-							<Form.FieldErrors />
-						</Form.Field>
-						<Form.Field {form} name="description">
+	<div class="flex w-full items-stretch justify-stretch gap-1 p-2">
+		<div class="card prose h-full max-w-full">
+			<header>
+				<h1>Edit Exercise</h1>
+				<span>Edit the exercise details below.</span>
+			</header>
+			<section>
+				<form method="POST" use:enhance>
+					<Form.Field {form} name="title">
+						<Form.Control let:attrs>
+							<Form.Label>Title</Form.Label>
+							<Input {...attrs} bind:value={$data.title} />
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<div class="grid grid-cols-[6rem_1fr] gap-2">
+						<Form.Field {form} name="description" class="flex items-center">
 							<Form.Control let:attrs>
 								<Form.Label>Description</Form.Label>
 								<Input {...attrs} type="hidden" bind:value={$data.description} />
-								<Button
-									class="block"
-									on:click={() => select('description')}
-									size="sm"
-									variant="default"
-								>
-									<span>Edit</span>
-									<CornerUpRight class="inline-block h-4 w-4" />
-								</Button>
 							</Form.Control>
 							<Form.FieldErrors />
 						</Form.Field>
-					</form>
-				</section>
-			</div>
-		</Pane>
-		<Pane size={50} minSize={20} class="!h-auto pr-2">
-			<div class="card h-full">
-				{#if $data.selected_field}
-					{#if $data.selected_field === 'description'}
-						<RichEditor bind:content={$data.description} />
-					{:else}
-						Selected an invalid field. This is a bug.
-					{/if}
-				{:else}
-					<div
-						class="text-muted-foreground flex h-full w-full select-none
-						items-center justify-center rounded-lg bg-zinc-100 italic"
-					>
-						<span>No Field Selected</span>
+						<Button on:click={() => select('description')} size="sm" variant="outline">
+							<span>Edit</span>
+							<CornerUpRight class="ml-2 h-4 w-4" />
+						</Button>
+						
+						<h6 class="text-bold col-span-2 mt-2">Test Cases</h6>
+						<Form.Field {form} name="generator" class="flex items-center">
+							<Form.Control let:attrs>
+								<Form.Label>Generator</Form.Label>
+								<Input {...attrs} type="hidden" bind:value={$data.description} />
+							</Form.Control>
+							<Form.FieldErrors />
+						</Form.Field>
+						<Button on:click={() => select('generator')} size="sm" variant="outline">
+							<span>Edit</span>
+							<CornerUpRight class="ml-2 h-4 w-4" />
+						</Button>
+						<Form.Field {form} name="generated_table" class="flex items-center">
+							<Form.Control let:attrs>
+								<Form.Label>Table</Form.Label>
+								<Input {...attrs} type="hidden" bind:value={$data.description} />
+							</Form.Control>
+							<Form.FieldErrors />
+						</Form.Field>
+						<Button on:click={() => select('table')} size="sm" variant="outline">
+							<span>Edit</span>
+							<CornerUpRight class="ml-2 h-4 w-4" />
+						</Button>
+
+						<div class=" col-span-2 border-b border-zinc-100" />
+
+						<Button variant="outline" disabled>Preview</Button>
+						<Form.Button>Submit</Form.Button>
 					</div>
+				</form>
+			</section>
+		</div>
+		<div class="card h-auto flex-grow">
+			{#if $data.selected_field}
+				{#if $data.selected_field === 'description'}
+					<RichEditor bind:content={$data.description} />
+				{:else}
+					Selected an invalid field. This is a bug.
 				{/if}
-			</div>
-		</Pane>
-	</Splitpanes>
+			{:else}
+				<div
+					class="text-muted-foreground flex h-full w-full select-none
+						items-center justify-center rounded-lg bg-zinc-100 italic"
+				>
+					<span>No Field Selected</span>
+				</div>
+			{/if}
+		</div>
+	</div>
 </Page>
