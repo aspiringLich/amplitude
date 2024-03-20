@@ -43,8 +43,8 @@
 
     const dispatch = createEventDispatcher<{ change: string }>();
 
+    export let view: EditorView = undefined as any;
     let element: HTMLDivElement;
-    let view: EditorView;
 
     let update_from_prop = false;
     let update_from_state = false;

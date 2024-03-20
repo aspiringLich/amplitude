@@ -17,7 +17,7 @@
 	<Select.Content>
 		{#each Object.entries(langs) as [lang, info]}
 			{#if filter(info)}
-				<Select.Item value={lang}>{lang}</Select.Item>
+				<Select.Item value={lang} class="capitalize">{lang}</Select.Item>
 			{/if}
 		{/each}
 	</Select.Content>

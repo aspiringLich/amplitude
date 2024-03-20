@@ -14,6 +14,9 @@
 	import { debounce } from '@melt-ui/svelte/internal/helpers';
 	import { superForm } from 'sveltekit-superforms';
 	import { toast } from 'svelte-sonner';
+	import { langs } from '$src/lib/components/editor/lang';
+	import type { EditorView } from 'codemirror';
+	import { EditorSelection, Text } from '@codemirror/state';
 
 	let selected = $selected_draft;
 	let exercise = $drafts[selected];
@@ -33,6 +36,32 @@
 		if ($data.selected_field === field) $data.selected_field = undefined;
 		else $data.selected_field = field;
 		update();
+	};
+
+	let view: EditorView;
+	const onLangChange = (lang: keyof typeof langs | undefined) => {
+		if (lang && view) {
+			const code_fn = langs[lang].code;
+			if (!code_fn) return;
+			const { code, cursor } = code_fn({
+				func: ['example']
+			});
+			if (typeof cursor === 'number') {
+				const t = view.state.update({
+					changes: { from: 0, to: view.state.doc.length, insert: code },
+					selection: { anchor: cursor, head: cursor }
+				});
+				view.dispatch(t);
+			} else {
+				const [anchor, head] = cursor;
+				const t = view.state.update({
+					changes: { from: 0, to: view.state.doc.length, insert: code },
+					selection: { anchor, head }
+				});
+				view.dispatch(t);
+			}
+			view.focus();
+		}
 	};
 </script>
 
@@ -113,7 +142,7 @@
 			{#if s === 'description'}
 				<RichEditor bind:content={$data.description} />
 			{:else if s === 'generator'}
-				<Editor bind:value={$data.generator} lang={$data.generator_lang} />
+				<Editor bind:value={$data.generator} bind:view lang={$data.generator_lang} {onLangChange} />
 			{:else}
 				Selected an invalid field. This is a bug.
 			{/if}
