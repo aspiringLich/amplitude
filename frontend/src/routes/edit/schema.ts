@@ -1,3 +1,4 @@
+import { names, langs } from '$src/lib/components/editor/lang';
 import type { Infer, SuperValidated } from 'sveltekit-superforms';
 import { z, type RefinementCtx } from 'zod';
 
@@ -10,16 +11,18 @@ const literalSchema = z.union([
 	z.string().max(1000, 'strings may not be longer than 1000 bytes'),
 	z.number(),
 	z.boolean(),
-	z.null(),
+	z.null()
 ]);
 type Literal = z.infer<typeof literalSchema>;
+
+const langSchema = z.enum(names);
 
 export const exerciseSchema = z.object({
 	title: z.string().trim().min(5).max(32),
 	description: z.string().max(6000).superRefine(sanitize_html),
-	generator: z.string().max(6000),
+	generator_lang: langSchema.optional(),
+	generator: z.string().max(6000).optional(),
 	generated_table: z.array(literalSchema).max(100),
-	
 	starting_code: z.string().max(6000)
 });
 
