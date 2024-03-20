@@ -4,8 +4,6 @@
 
 	export let value:  string | null | undefined;
 	export let lang: keyof typeof langs | undefined = undefined; 
-
-	import { markdown } from '@codemirror/lang-markdown';
 </script>
 
-<RawEditor bind:value lang={lang && langs[lang] ? langs[lang].lang() : undefined} />
+<RawEditor bind:value lang={lang && langs[lang] ? langs[lang].lang : undefined} />

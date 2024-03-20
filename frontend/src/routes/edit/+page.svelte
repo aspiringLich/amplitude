@@ -25,7 +25,7 @@
 	const form = superForm(exercise, {
 		validators: zodClient(exerciseSchema),
 		onChange: update,
-		onError: (e) => toast.error(e.result.error.message),
+		onError: (e) => toast.error(e.result.error.message)
 	});
 	const { form: data, enhance } = form;
 
@@ -36,93 +36,94 @@
 	};
 </script>
 
-<Page center class="max-w-4xl grow">
-	<div class="flex w-full items-stretch justify-stretch gap-1 p-2">
-		<div class="card prose h-full max-w-full">
-			<header>
-				<h1>Edit Exercise</h1>
-				<span>Edit the exercise details below.</span>
-			</header>
-			<section>
-				<form method="POST" use:enhance>
-					<Form.Field {form} name="title">
+<Page center class="flex w-full max-w-4xl grow items-stretch justify-stretch gap-1 p-2">
+	<div class="card prose h-full max-w-full">
+		<header>
+			<h1>Edit Exercise</h1>
+			<span>Edit the exercise details below.</span>
+		</header>
+		<section>
+			<form method="POST" use:enhance>
+				<Form.Field {form} name="title">
+					<Form.Control let:attrs>
+						<Form.Label>Title</Form.Label>
+						<Input {...attrs} bind:value={$data.title} />
+					</Form.Control>
+					<Form.FieldErrors />
+				</Form.Field>
+				<div class="grid grid-cols-[6rem_1fr] gap-2">
+					<Form.Field {form} name="description" class="flex items-center">
 						<Form.Control let:attrs>
-							<Form.Label>Title</Form.Label>
-							<Input {...attrs} bind:value={$data.title} />
+							<Form.Label>Description</Form.Label>
+							<Input {...attrs} type="hidden" bind:value={$data.description} />
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
-					<div class="grid grid-cols-[6rem_1fr] gap-2">
-						<Form.Field {form} name="description" class="flex items-center">
-							<Form.Control let:attrs>
-								<Form.Label>Description</Form.Label>
-								<Input {...attrs} type="hidden" bind:value={$data.description} />
-							</Form.Control>
-							<Form.FieldErrors />
-						</Form.Field>
-						<Button on:click={() => select('description')} size="sm" variant="outline">
-							<span>Edit</span>
-							<CornerUpRight class="ml-2 h-4 w-4" />
-						</Button>
+					<Button on:click={() => select('description')} size="sm" variant="outline">
+						<span>Edit</span>
+						<CornerUpRight class="ml-2 h-4 w-4" />
+					</Button>
 
-						<h6 class="text-bold col-span-2 mt-2">Test Cases</h6>
-						<Form.Field {form} name="generator_lang" class="flex items-center">
-							<Form.Control let:attrs>
-								<Form.Label>Generator Language</Form.Label>
-								<Input {...attrs} type="hidden" bind:value={$data.generator_lang} />
-							</Form.Control>
-							<Form.FieldErrors />
-						</Form.Field>
-						<LangSelect bind:value={$data.generator_lang} />
-						<Form.Field {form} name="generator" class="flex items-center">
-							<Form.Control let:attrs>
-								<Form.Label>Generator</Form.Label>
-								<Input {...attrs} type="hidden" bind:value={$data.generator} />
-							</Form.Control>
-							<Form.FieldErrors />
-						</Form.Field>
-						<Button on:click={() => select('generator')} size="sm" variant="outline">
-							<span>Edit</span>
-							<CornerUpRight class="ml-2 h-4 w-4" />
-						</Button>
-						<Form.Field {form} name="generated_table" class="flex items-center">
-							<Form.Control let:attrs>
-								<Form.Label>Table</Form.Label>
-								<Input {...attrs} type="hidden" bind:value={$data.generated_table} />
-							</Form.Control>
-							<Form.FieldErrors />
-						</Form.Field>
-						<Button on:click={() => select('table')} size="sm" variant="outline">
-							<span>Edit</span>
-							<CornerUpRight class="ml-2 h-4 w-4" />
-						</Button>
+					<h6 class="text-bold col-span-2 mt-2 cursor-default">Test Cases</h6>
+					<Form.Field {form} name="generator_lang" class="flex items-center">
+						<Form.Control let:attrs>
+							<Form.Label>Generator Language</Form.Label>
+							<Input {...attrs} type="hidden" bind:value={$data.generator_lang} />
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<LangSelect
+						bind:value={$data.generator_lang}
+						filter={({ type }) => type == 'scripting'}
+					/>
+					<Form.Field {form} name="generator" class="flex items-center">
+						<Form.Control let:attrs>
+							<Form.Label>Generator</Form.Label>
+							<Input {...attrs} type="hidden" bind:value={$data.generator} />
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<Button on:click={() => select('generator')} size="sm" variant="outline">
+						<span>Edit</span>
+						<CornerUpRight class="ml-2 h-4 w-4" />
+					</Button>
+					<Form.Field {form} name="generated_table" class="flex items-center">
+						<Form.Control let:attrs>
+							<Form.Label>Table</Form.Label>
+							<Input {...attrs} type="hidden" bind:value={$data.generated_table} />
+						</Form.Control>
+						<Form.FieldErrors />
+					</Form.Field>
+					<Button on:click={() => select('table')} size="sm" variant="outline">
+						<span>Edit</span>
+						<CornerUpRight class="ml-2 h-4 w-4" />
+					</Button>
 
-						<div class=" col-span-2 border-b border-zinc-100" />
+					<div class=" col-span-2 border-b border-zinc-100" />
 
-						<Button variant="outline" disabled>Preview</Button>
-						<Form.Button>Submit</Form.Button>
-					</div>
-				</form>
-			</section>
-		</div>
-		<div class="card flex h-auto flex-grow flex-col">
-			{#if $data.selected_field}
-				{@const s = $data.selected_field}
-				{#if s === 'description'}
-					<RichEditor bind:content={$data.description} />
-				{:else if s === 'generator'}
-					<Editor bind:value={$data.generator} lang={$data.generator_lang} />
-				{:else}
-					Selected an invalid field. This is a bug.
-				{/if}
-			{:else}
-				<div
-					class="text-muted-foreground flex h-full w-full select-none
-						items-center justify-center rounded-lg bg-zinc-100 italic"
-				>
-					<span>No Field Selected</span>
+					<Button variant="outline" disabled>Preview</Button>
+					<Form.Button>Submit</Form.Button>
 				</div>
+			</form>
+		</section>
+	</div>
+	<div class="card flex h-auto flex-grow flex-col">
+		{#if $data.selected_field}
+			{@const s = $data.selected_field}
+			{#if s === 'description'}
+				<RichEditor bind:content={$data.description} />
+			{:else if s === 'generator'}
+				<Editor bind:value={$data.generator} lang={$data.generator_lang} />
+			{:else}
+				Selected an invalid field. This is a bug.
 			{/if}
-		</div>
+		{:else}
+			<div
+				class="text-muted-foreground flex h-full w-full select-none
+						items-center justify-center rounded-lg bg-zinc-100 italic"
+			>
+				<span>No Field Selected</span>
+			</div>
+		{/if}
 	</div>
 </Page>

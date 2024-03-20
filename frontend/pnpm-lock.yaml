@@ -40,9 +40,15 @@ devDependencies:
   '@codemirror/commands':
     specifier: ^6.3.3
     version: 6.3.3
+  '@codemirror/lang-javascript':
+    specifier: ^6.2.2
+    version: 6.2.2
   '@codemirror/lang-markdown':
     specifier: ^6.2.4
     version: 6.2.4
+  '@codemirror/lang-python':
+    specifier: ^6.1.4
+    version: 6.1.4(@codemirror/view@6.25.1)
   '@codemirror/language':
     specifier: ^6.10.1
     version: 6.10.1
@@ -282,6 +288,18 @@ packages:
       '@codemirror/view': 6.25.1
       '@lezer/common': 1.2.1
       '@lezer/markdown': 1.2.0
+    dev: true
+
+  /@codemirror/lang-python@6.1.4(@codemirror/view@6.25.1):
+    resolution: {integrity: sha512-b6d1TDqrkCjFNvMO01SWldFiDoZ39yl3tDMC1Y5f8glA2eZpynPxJhwYVTlGFr0stizcJgrp6ojLEGH2myoZAw==}
+    dependencies:
+      '@codemirror/autocomplete': 6.14.0(@codemirror/language@6.10.1)(@codemirror/state@6.4.1)(@codemirror/view@6.25.1)(@lezer/common@1.2.1)
+      '@codemirror/language': 6.10.1
+      '@codemirror/state': 6.4.1
+      '@lezer/common': 1.2.1
+      '@lezer/python': 1.1.13
+    transitivePeerDependencies:
+      - '@codemirror/view'
     dev: true
 
   /@codemirror/language@6.10.1:
@@ -849,6 +867,14 @@ packages:
     dependencies:
       '@lezer/common': 1.2.1
       '@lezer/highlight': 1.2.0
+    dev: true
+
+  /@lezer/python@1.1.13:
+    resolution: {integrity: sha512-AdbRAtdQq94PfTNd4kqMEJhH2fqa2JdoyyqqVewY6w34w2Gi6dg2JuOtOgR21Bi0zP9r0KjSSHOUq/tP7FVT8A==}
+    dependencies:
+      '@lezer/common': 1.2.1
+      '@lezer/highlight': 1.2.0
+      '@lezer/lr': 1.4.0
     dev: true
 
   /@melt-ui/pp@0.3.0(@melt-ui/svelte@0.74.4)(svelte@4.2.12):
