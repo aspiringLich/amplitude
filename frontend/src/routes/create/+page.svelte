@@ -24,7 +24,9 @@
 			e.push({
 				title: 'Untitled Exercise',
 				description: '',
-				generator: '',
+				generator_lang: undefined,
+				generator: undefined,
+				generated_table: [],
 				starting_code: '',
 			});
 			return e;
@@ -62,7 +64,7 @@
 						<Table.Head class="flex items-center justify-between">
 							Your Drafts
 							<Tooltip.Root>
-								<a href="/create/edit">
+								<a href="/edit">
 									<Button
 										on:click={create_draft}
 										class="rounded-full"

@@ -18,6 +18,8 @@
 	import { onMount } from 'svelte';
 	import AvatarSection from './AvatarSection.svelte';
 	import { writable } from 'svelte/store';
+	import { Toaster } from '$lib/components/ui/sonner';
+	import { ModeWatcher } from 'mode-watcher';
 
 	let notify = writable<Event | undefined | null>(undefined);
 	let init = false;
@@ -83,6 +85,8 @@
 		{/if}
 	</div>
 </div>
+<Toaster theme="light" />
+<ModeWatcher defaultMode={'light'} track={false} />
 
 <style lang="postcss">
 	.nav.highlight {
