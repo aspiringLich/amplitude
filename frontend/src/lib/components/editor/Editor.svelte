@@ -5,11 +5,12 @@
 
 	export let value: string | null | undefined;
 	export let lang: keyof typeof langs | undefined = undefined;
-	export let view: EditorView;
-	
+
+	export let view: EditorView = undefined as any;
+
 	export let onChange: (value: string) => void = () => {};
 	export let onLangChange: (lang: keyof typeof langs | undefined) => void = () => {};
-	
+
 	$: onLangChange(lang);
 </script>
 
