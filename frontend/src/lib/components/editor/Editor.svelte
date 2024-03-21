@@ -5,6 +5,8 @@
 
 	export let value: string | null | undefined;
 	export let lang: keyof typeof langs | undefined = undefined;
+	export { className as class };
+	let className: string = '';
 
 	export let view: EditorView = undefined as any;
 
@@ -18,5 +20,6 @@
 	bind:value
 	bind:view
 	lang={lang && langs[lang] ? langs[lang].lang : undefined}
+	class={className}
 	on:change={(e) => onChange(e.detail)}
 />

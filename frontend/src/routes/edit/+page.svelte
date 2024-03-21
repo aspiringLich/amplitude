@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Page from '$src/lib/Page.svelte';
 	import * as Form from '$lib/components/ui/form';
+	import * as Tabs from '$lib/components/ui/tabs';
 	import { Button } from '$src/lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import RichEditor from '$src/lib/components/editor/RichEditor.svelte';
@@ -16,7 +17,6 @@
 	import { toast } from 'svelte-sonner';
 	import { langs } from '$src/lib/components/editor/lang';
 	import type { EditorView } from 'codemirror';
-	import { EditorSelection, Text } from '@codemirror/state';
 
 	let selected = $selected_draft;
 	let exercise = $drafts[selected];
@@ -142,7 +142,22 @@
 			{#if s === 'description'}
 				<RichEditor bind:content={$data.description} />
 			{:else if s === 'generator'}
-				<Editor bind:value={$data.generator} bind:view lang={$data.generator_lang} {onLangChange} />
+				<Tabs.Root class="h-full flex flex-col">
+					<Tabs.List class="flex w-full items-stretch">
+						<Tabs.Trigger value="editor">Editor</Tabs.Trigger>
+						<Tabs.Trigger value="table">Table</Tabs.Trigger>
+					</Tabs.List>
+					<Tabs.Content class="mt-0 grow flex" value="editor">
+						<Editor
+							class="grow"
+							bind:value={$data.generator}
+							bind:view
+							lang={$data.generator_lang}
+							{onLangChange}
+						/>
+					</Tabs.Content>
+					<Tabs.Content value="table"></Tabs.Content>
+				</Tabs.Root>
 			{:else}
 				Selected an invalid field. This is a bug.
 			{/if}
