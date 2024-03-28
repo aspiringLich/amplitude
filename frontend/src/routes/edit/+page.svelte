@@ -37,7 +37,8 @@
 		else $data.selected_field = field;
 		update();
 	};
-
+	
+	let generator_tab: string;
 	let view: EditorView;
 	const onLangChange = (lang: keyof typeof langs | undefined) => {
 		if (lang && view) {
@@ -142,12 +143,12 @@
 			{#if s === 'description'}
 				<RichEditor bind:content={$data.description} />
 			{:else if s === 'generator'}
-				<Tabs.Root class="h-full flex flex-col">
-					<Tabs.List class="flex w-full items-stretch">
+				<Tabs.Root class="h-full flex flex-col" bind:value={generator_tab}>
+					<Tabs.List class="flex w-full items-stretch bg-zinc-100">
 						<Tabs.Trigger value="editor">Editor</Tabs.Trigger>
-						<Tabs.Trigger value="table">Table</Tabs.Trigger>
+						<Tabs.Trigger value="cases">Test Cases</Tabs.Trigger>
 					</Tabs.List>
-					<Tabs.Content class="mt-0 grow flex" value="editor">
+					{#if generator_tab === 'editor'}
 						<Editor
 							class="grow"
 							bind:value={$data.generator}
@@ -155,8 +156,15 @@
 							lang={$data.generator_lang}
 							{onLangChange}
 						/>
-					</Tabs.Content>
-					<Tabs.Content value="table"></Tabs.Content>
+					{:else if generator_tab === 'cases'}
+						<Editor
+							class="grow"
+							bind:value={$data.generator}
+							bind:view
+							lang={$data.generator_lang}
+							{onLangChange}
+						/>
+					{/if}
 				</Tabs.Root>
 			{:else}
 				Selected an invalid field. This is a bug.

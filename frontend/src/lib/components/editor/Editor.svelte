@@ -2,6 +2,7 @@
 	import { langs } from '$src/lib/components/editor/lang';
 	import type { EditorView } from 'codemirror';
 	import RawEditor from './RawEditor.svelte';
+	import { onDestroy } from 'svelte';
 
 	export let value: string | null | undefined;
 	export let lang: keyof typeof langs | undefined = undefined;
@@ -14,6 +15,10 @@
 	export let onLangChange: (lang: keyof typeof langs | undefined) => void = () => {};
 
 	$: onLangChange(lang);
+
+	onDestroy(() => {
+		view?.destroy();
+	});
 </script>
 
 <RawEditor

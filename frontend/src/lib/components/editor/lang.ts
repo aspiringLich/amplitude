@@ -1,9 +1,10 @@
 import { markdown } from '@codemirror/lang-markdown';
 import { python } from '@codemirror/lang-python';
 import { javascript } from '@codemirror/lang-javascript';
+import { yaml } from '@codemirror/lang-yaml';
 import type { LanguageSupport } from '@codemirror/language';
 
-export type LangType = 'markup' | 'scripting' | 'compiled';
+export type LangType = 'markup' | 'scripting' | 'compiled' | 'config';
 export type CodeFnReturn = { code: string; cursor: [number, number] | number };
 export type CodeFn = (fns: { [key: string]: string[] }) => CodeFnReturn;
 export type LangInfo = {
@@ -49,7 +50,16 @@ export const langs: { [key: string]: LangInfo } = {
 				cursor: pos + 1
 			};
 		}
+	},
+	yaml: {
+		lang: yaml(),
+		type: 'config'
 	}
 };
 
-export const names: ['markdown', 'python', 'javascript'] = ['markdown', 'python', 'javascript'];
+export const names: ['markdown', 'python', 'javascript', 'yaml'] = [
+	'markdown',
+	'python',
+	'javascript',
+	'yaml'
+];
