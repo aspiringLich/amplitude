@@ -5,6 +5,12 @@ use serde::{de::Error, Deserialize, Deserializer};
 #[derive(Deserialize)]
 pub struct Config {
     pub session: SessionConfig,
+    pub docker: DockerConfig,
+}
+
+#[derive(Deserialize)]
+pub struct DockerConfig {
+    pub host: String,
 }
 
 #[derive(Deserialize)]

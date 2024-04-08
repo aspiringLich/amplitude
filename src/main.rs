@@ -6,6 +6,7 @@
 use std::{env, fs, sync::Arc, time::Duration};
 
 use axum::Router;
+use docker_api::Docker;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use tokio::{signal, task::AbortHandle};
 use tracing::Level;
@@ -17,6 +18,7 @@ mod app;
 mod config;
 mod format;
 mod routes;
+mod runner;
 mod views;
 
 #[tokio::main]
@@ -36,6 +38,7 @@ async fn main() -> eyre::Result<()> {
     tracing::info!("Starting up...");
 
     let config: config::Config = serde_yaml::from_str(&fs::read_to_string("config.yaml")?)?;
+    let expired_clear_interval = config.session.expired_clear_interval;
     let secrets: config::Secrets = serde_yaml::from_str(&fs::read_to_string("secrets.yaml")?)?;
 
     if fs::try_exists(".env")? {
@@ -59,16 +62,18 @@ async fn main() -> eyre::Result<()> {
     };
     tracing::info!("Connected to database at `{}`", &url);
 
-    let expired_clear_interval = config.session.expired_clear_interval;
+    let docker = Docker::new(&config.docker.host)?;
+    tracing::info!("Connected to Docker Daemon at `{}`", &config.docker.host);
 
-    let router: Router<_> = routes::routes();
     let state = AppState {
         config,
         secrets,
         db: db.clone(),
+        docker,
     };
 
     let state = Arc::new(state);
+    let router: Router<_> = routes::routes();
     let router: Router<()> = router.with_state(state);
     let listener = tokio::net::TcpListener::bind("localhost:3000").await?;
 

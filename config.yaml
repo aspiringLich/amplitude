@@ -1,3 +1,6 @@
 session:
   expiration: 7d
   expired_clear_interval: 1m
+
+docker:
+  host: unix:///var/run/docker.sock
