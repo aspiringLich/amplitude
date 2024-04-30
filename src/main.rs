@@ -2,6 +2,7 @@
 #![feature(try_trait_v2)]
 #![feature(iter_map_windows)]
 #![feature(decl_macro)]
+#![feature(async_closure)]
 
 use std::{env, fs, sync::Arc, time::Duration};
 
@@ -64,12 +65,14 @@ async fn main() -> eyre::Result<()> {
 
     let docker = Docker::new(&config.docker.host)?;
     tracing::info!("Connected to Docker Daemon at `{}`", &config.docker.host);
+    let runner_registry = runner::generate_registry(&config.docker, &docker).await?;
 
     let state = AppState {
         config,
         secrets,
         db: db.clone(),
         docker,
+        runner_registry,
     };
 
     let state = Arc::new(state);
