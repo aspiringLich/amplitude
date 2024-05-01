@@ -41,22 +41,21 @@ impl Runner {
         cfg: &DockerConfig,
         docker: &Docker,
     ) -> docker_api::Result<Self> {
+        let name = cfg.name_prefix.clone() + language;
+
         let images = docker.images();
-        let filter = ImageFilter::Label(cfg.image_label.clone(), language.to_string());
+        let filter = ImageFilter::Reference(name.clone(), None);
         let list_opts = ImageListOpts::builder().filter([filter]);
-        let image_list = images.list(&list_opts.build()).await.unwrap_or_default();
-        assert!(
-            image_list.len() <= 1,
-            "Docker Image ids should be unique how did you even do this?"
-        );
+        let image_list = images.list(&list_opts.build()).await?;
+        assert!(image_list.len() <= 1, "Docker Image names should be unique");
 
         // check if the image exists
         let image = match image_list.first() {
-            Some(s) => docker.images().get(&s.id),
+            Some(s) => images.get(&s.id),
             None => {
-                tracing::info!("Building new docker image: `{language}`");
+                tracing::info!("Building new docker image: `{name}`");
                 let build_opts = ImageBuildOpts::builder(format!("src/runner/{language}"))
-                    .tag(cfg.name_prefix.clone() + language)
+                    .tag(name)
                     .labels([(cfg.image_label.clone(), language.to_string())])
                     .memory(4096 * 4096);
                 let stream = images.build(&build_opts.build());
@@ -74,22 +73,12 @@ async fn consume_image_build_stream(
 ) {
     while let Some(s) = stream.next().await {
         match s {
-            Ok(ImageBuildChunk::Update { stream }) => tracing::trace!("update: {stream}"),
-
+            Ok(ImageBuildChunk::Update { stream }) => eprintln!("{}", stream.trim()),
             Ok(ImageBuildChunk::Error { error, .. }) => tracing::error!("{error}"),
-            Ok(ImageBuildChunk::Digest { aux }) => tracing::trace!("aux: {}", aux.id),
-            Ok(ImageBuildChunk::PullStatus {
-                status,
-                id,
-                progress,
-                progress_detail,
-            }) => tracing::trace!(
-                id = id,
-                progress = progress,
-                current = progress_detail.as_ref().and_then(|d| d.current),
-                total = progress_detail.as_ref().and_then(|d| d.total),
-                "pull status: {status}",
-            ),
+            Ok(ImageBuildChunk::Digest { aux }) => eprintln!("{}", aux.id),
+            Ok(ImageBuildChunk::PullStatus { progress, .. }) => {
+                eprintln!("{}", progress.unwrap_or_default())
+            }
             Err(e) => tracing::error!("{e}"),
         }
     }

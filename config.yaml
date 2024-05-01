@@ -5,4 +5,4 @@ session:
 docker:
   host: unix:///var/run/docker.sock
   image_label: amplitude-runner
-  name_prefix: amplitude-runner-
+  name_prefix: amplitude-runner/

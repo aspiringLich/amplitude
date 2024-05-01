@@ -10,8 +10,8 @@ use axum::Router;
 use docker_api::Docker;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection};
 use tokio::{signal, task::AbortHandle};
-use tracing::Level;
-use tracing_subscriber::{filter, layer::SubscriberExt, util::SubscriberInitExt};
+use tracing::{instrument::WithSubscriber, Level};
+use tracing_subscriber::{filter, layer::SubscriberExt, util::SubscriberInitExt, Layer};
 
 use crate::app::AppState;
 

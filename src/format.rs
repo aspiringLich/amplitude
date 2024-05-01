@@ -166,9 +166,9 @@ where
     ) -> std::fmt::Result {
         match event.metadata().module_path() {
             Some(module) if module.starts_with("sqlx") => format_event_sqlx(ctx, writer, event),
-            _ => {
-                tracing_subscriber::fmt::format::Format::default().format_event(ctx, writer, event)
-            }
+            _ => tracing_subscriber::fmt::format::Format::default()
+                .without_time()
+                .format_event(ctx, writer, event),
         }
     }
 }
