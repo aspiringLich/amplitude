@@ -3,20 +3,23 @@ use std::collections::BTreeMap;
 use docker_api::{
     models::ImageBuildChunk,
     opts::{
-        ContainerCreateOpts, ContainerCreateOptsBuilder, ImageBuildOpts, ImageFilter,
-        ImageListOpts, NetworkCreateOpts, NetworkFilter, NetworkListOpts,
+        ContainerCreateOpts, ImageBuildOpts, ImageFilter, ImageListOpts, NetworkCreateOpts,
+        NetworkFilter, NetworkListOpts,
     },
-    Container, Docker, Id,
+    Container, Docker,
 };
 use futures::{stream::StreamExt, Stream};
+use handlebars::Handlebars;
 use uuid::Uuid;
 
 use crate::config::DockerConfig;
 
+mod exec;
+
 pub struct Runner {
-    image_id: String,
-    network_id: String,
-    container_name_base: String,
+    pub image_id: String,
+    pub network_id: String,
+    pub container_name_base: String,
 }
 
 pub type RunnerRegistry = BTreeMap<String, Runner>;
@@ -24,6 +27,7 @@ pub type RunnerRegistry = BTreeMap<String, Runner>;
 pub async fn generate_registry(
     cfg: &DockerConfig,
     docker: &Docker,
+    handlebars: &mut Handlebars<'_>,
 ) -> docker_api::Result<RunnerRegistry> {
     let network_name = cfg.name_prefix.clone() + "network";
 
@@ -54,6 +58,23 @@ pub async fn generate_registry(
         .await
         .into_iter()
         .collect::<Result<Vec<_>, _>>()?;
+
+    // register handlebars templates
+    for lang in cfg.languages.iter() {
+        handlebars
+            .register_template_file(
+                &format!("{lang}/generator"),
+                &format!("src/runner/{lang}/generator.hbs"),
+            )
+            .expect("Failed to register template file");
+        handlebars
+            .register_template_file(
+                &format!("{lang}/runner"),
+                &format!("src/runner/{lang}/runner.hbs"),
+            )
+            .expect("Failed to register template file");
+    }
+
     let registry = cfg.languages.iter().cloned().zip(runners).collect();
     Ok(registry)
 }
@@ -97,10 +118,7 @@ impl Runner {
         })
     }
 
-    pub async fn create_container(
-        &self,
-        docker: &Docker,
-    ) -> docker_api::Result<Container> {
+    async fn create_container(&self, docker: &Docker) -> docker_api::Result<Container> {
         let uuid = Uuid::now_v7();
         let opts = ContainerCreateOpts::builder()
             .image(&self.image_id)
@@ -109,7 +127,9 @@ impl Runner {
             .network_mode(&self.network_id)
             .privileged(false)
             .name(self.container_name_base.clone() + &uuid.to_string());
-        docker.containers().create(&opts.build()).await
+        let container = docker.containers().create(&opts.build()).await?;
+
+        Ok(container)
     }
 }
 

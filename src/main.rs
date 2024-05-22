@@ -65,7 +65,10 @@ async fn main() -> eyre::Result<()> {
 
     let docker = Docker::new(&config.docker.host)?;
     tracing::info!("Connected to Docker Daemon at `{}`", &config.docker.host);
-    let runner_registry = runner::generate_registry(&config.docker, &docker).await?;
+
+    let mut handlebars = handlebars::Handlebars::new();
+    let runner_registry =
+        runner::generate_registry(&config.docker, &docker, &mut handlebars).await?;
 
     let state = AppState {
         config,

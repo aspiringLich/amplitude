@@ -47,3 +47,4 @@ log = "0.4.20"
 nu-ansi-term = "0.50.0"
 docker-api = { git = "https://github.com/vv9k/docker-api-rs.git", rev = "b1f1891" }
 futures = "0.3.30"
+handlebars = "5.1.2"

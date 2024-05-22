@@ -1,0 +1,53 @@
+{{content}}
+
+import json
+import random
+
+class Context:
+    _context = []
+    hidden = False
+
+    from random import randint, random, randrange
+    
+    def __init__(self, hidden_cases, visible_cases):
+        self.hidden_cases = hidden_cases
+        self.visible_cases = visible_cases
+
+    def inputs(self, inputs):
+        has = hasattr(self._context[-1], "output")
+        assert not has, "inputs() method has been called more than once"
+        self._context[-1]["inputs"] = inputs
+
+    def output(self, value):
+        has = hasattr(self._context[-1], "output")
+        assert not has, "output() method has been called more than once"
+        self._context[-1]["output"] = value
+
+
+contexts = {}
+
+def test_func(fn_name, ctx):
+    def push(ctx):
+        ctx._context.append({})
+    
+    try: gen = globals()["gen_" + fn_name]
+    except KeyError: raise KeyError(f"Could not find function `gen_{fn_name}`")
+
+    for i in range(ctx.hidden_cases):
+        push(ctx)
+        gen(ctx)
+
+    ctx.hidden = True
+
+    for i in range(ctx.visible_cases):
+        push(ctx)
+        gen(ctx)
+
+    contexts[fn_name] = ctx._context
+
+{{#each functions}}
+random.seed({{seed}})
+test_func("{{@key}}", Context({{hidden_cases}}, {{visible_cases}}))
+{{/each}}
+
+print(json.dumps(contexts))
