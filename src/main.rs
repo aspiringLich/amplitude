@@ -1,4 +1,3 @@
-#![feature(fs_try_exists)]
 #![feature(try_trait_v2)]
 #![feature(iter_map_windows)]
 #![feature(decl_macro)]
@@ -8,10 +7,12 @@ use std::{env, fs, sync::Arc, time::Duration};
 
 use axum::Router;
 use docker_api::Docker;
-use sea_orm::{ConnectOptions, Database, DatabaseConnection};
+use sea_orm::{
+    ConnectOptions, ConnectionTrait, Database, DatabaseConnection, DbBackend, DbErr, Statement,
+};
 use tokio::{signal, task::AbortHandle};
-use tracing::{instrument::WithSubscriber, Level};
-use tracing_subscriber::{filter, layer::SubscriberExt, util::SubscriberInitExt, Layer};
+use tracing::Level;
+use tracing_subscriber::{filter, layer::SubscriberExt, util::SubscriberInitExt};
 
 use crate::app::AppState;
 
@@ -42,26 +43,57 @@ async fn main() -> eyre::Result<()> {
     let expired_clear_interval = config.session.expired_clear_interval;
     let secrets: config::Secrets = serde_yaml::from_str(&fs::read_to_string("secrets.yaml")?)?;
 
-    if fs::try_exists(".env")? {
+    if fs::exists(".env")? {
         dotenv::from_filename(".env")?;
     } else {
         tracing::warn!("Add a `.env` file in the project root to set DATABASE_URL");
     }
 
-    let url = env::var("DATABASE_URL")?;
-    let mut opt = ConnectOptions::new(&url);
-    opt.acquire_timeout(Duration::from_secs_f32(1.0))
-        .sqlx_logging(true)
-        .sqlx_logging_level(log::LevelFilter::Debug);
+    let db_full_url = env::var("DATABASE_URL")?;
+    let Some((db_url, db_name)) = db_full_url.rsplit_once('/') else {
+        panic!("expected env DATABASE_URL to contain slashes")
+    };
+    let db_opts = |url: &str| {
+        let mut o = ConnectOptions::new(url);
+        o.acquire_timeout(Duration::from_secs_f32(1.0))
+            .sqlx_logging(true)
+            .sqlx_logging_level(log::LevelFilter::Debug);
+        o
+    };
 
-    let db = match Database::connect(opt).await {
+    let db = match Database::connect(db_opts(&db_url)).await {
         Ok(db) => db,
         Err(e) => {
-            tracing::error!("Failed to connect to database!");
+            tracing::error!("Failed to connect to postgresql!");
             return Err(e.into());
         }
     };
-    tracing::info!("Connected to database at `{}`", &url);
+    tracing::info!("Connected to postgresql at `{}`", &db_url);
+
+    let db = match db.get_database_backend() {
+        DbBackend::Postgres => match Database::connect(db_opts(&db_full_url)).await {
+            Ok(db) => db,
+            Err(DbErr::Conn(_)) => {
+                tracing::info!("Creating database `{db_name}`...");
+                db.execute(Statement::from_string(
+                    db.get_database_backend(),
+                    format!("DROP DATABASE IF EXISTS \"{}\";", db_name),
+                ))
+                .await?;
+                db.execute(Statement::from_string(
+                    db.get_database_backend(),
+                    format!("CREATE DATABASE \"{}\";", db_name),
+                ))
+                .await?;
+                Database::connect(&db_full_url).await?;
+
+                tracing::info!("Please run `cargo r -p migration -- fresh` to setup the database!");
+                return Ok(());
+            }
+            Err(e) => return Err(e.into()),
+        },
+        _ => unreachable!("expected postgres database"),
+    };
 
     let docker = Docker::new(&config.docker.host)?;
     tracing::info!("Connected to Docker Daemon at `{}`", &config.docker.host);
