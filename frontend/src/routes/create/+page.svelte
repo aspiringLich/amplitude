@@ -4,7 +4,11 @@
 	import type { Exercise } from '$src/routes/edit/schema';
 
 	export const selected_draft: Writable<number> = local_store('create/selected_draft', -1);
-	export type ExerciseDraft = Exercise & { selected_field?: string };
+	export type ExerciseDraft = Exercise & {
+		selected_field?: string;
+		generator?: string;
+		generator_lang?: string;
+	};
 	export const drafts: Writable<ExerciseDraft[]> = local_store('create/drafts', []);
 </script>
 
@@ -15,7 +19,6 @@
 	import { Plus, Trash2 } from 'lucide-svelte';
 
 	import Page from '$lib/Page.svelte';
-	import { refresh } from '$src/routes/+layout.svelte';
 
 	let _drafts = $drafts;
 
@@ -27,7 +30,7 @@
 				generator_lang: undefined,
 				generator: undefined,
 				generated_table: [],
-				starting_code: '',
+				starting_code: ''
 			});
 			return e;
 		});
@@ -52,12 +55,12 @@
 	<div class="card m-4">
 		<header>
 			<h1>Exercise Drafts</h1>
-		</header>
-		<section class="prose">
 			<p>
 				These drafts are stored locally on your device. When they are published, they will be
 				uploaded to your account and become available to other users.
 			</p>
+		</header>
+		<section class="shrink">
 			<Table.Root class="my-0 select-none">
 				<Table.Header>
 					<Table.Row class="hover:bg-background">
@@ -82,11 +85,7 @@
 				<Table.Body>
 					{#each _drafts as ex, i}
 						<Table.Row class="hover:bg-muted/50 flex items-center justify-between">
-							<a
-								class="block w-full no-underline"
-								href="/edit"
-								on:click={() => select_draft(i)}
-							>
+							<a class="block w-full no-underline" href="/edit" on:click={() => select_draft(i)}>
 								<Table.Cell class="relative w-full">
 									{ex?.title}
 								</Table.Cell>

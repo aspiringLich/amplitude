@@ -9,7 +9,7 @@
 	let selected: Selected<string> = { value: value || '' };
 </script>
 
-<Select.Root {selected} onSelectedChange={(s) => s && (value = s.value)}>
+<Select.Root selected={{ value, label: value }} onSelectedChange={(s) => s && (value = s.value)}>
 	<Select.Trigger class="w-[180px]">
 		<Select.Value placeholder="Select Language" />
 	</Select.Trigger>
