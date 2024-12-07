@@ -60,7 +60,7 @@
 			</p>
 			<Table.Root class="my-0 select-none">
 				<Table.Header>
-					<Table.Row>
+					<Table.Row class="hover:bg-background">
 						<Table.Head class="flex items-center justify-between">
 							Your Drafts
 							<Tooltip.Root>

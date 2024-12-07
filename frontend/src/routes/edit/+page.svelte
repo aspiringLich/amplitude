@@ -15,7 +15,7 @@
 	import { debounce } from '@melt-ui/svelte/internal/helpers';
 	import { superForm } from 'sveltekit-superforms';
 	import { toast } from 'svelte-sonner';
-	import { langs } from '$src/lib/components/editor/lang';
+	import { langs, type CodeFn } from '$src/lib/components/editor/lang';
 	import type { EditorView } from 'codemirror';
 
 	let selected = $selected_draft;
@@ -37,15 +37,19 @@
 		else $data.selected_field = field;
 		update();
 	};
-	
-	let generator_tab: string;
+	const variant = (data: typeof $data, field: string) => {
+		if (data.selected_field === field) return 'secondary';
+		else return 'outline';
+	};
+
 	let view: EditorView;
 	const onLangChange = (lang: keyof typeof langs | undefined) => {
 		if (lang && view) {
-			const code_fn = langs[lang].code;
+			console.assert(langs[lang].type == 'scripting');
+			const code_fn: CodeFn = (langs[lang] as any).code; // fine b/c the only fields available to the lang editor are scripting langs
 			if (!code_fn) return;
 			const { code, cursor } = code_fn({
-				func: ['example']
+				gen: ['ctx']
 			});
 			if (typeof cursor === 'number') {
 				const t = view.state.update({
@@ -89,7 +93,11 @@
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
-					<Button on:click={() => select('description')} size="sm" variant="outline">
+					<Button
+						on:click={() => select('description')}
+						size="sm"
+						variant={variant($data, 'description')}
+					>
 						<span>Edit</span>
 						<CornerUpRight class="ml-2 h-4 w-4" />
 					</Button>
@@ -113,7 +121,11 @@
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
-					<Button on:click={() => select('generator')} size="sm" variant="outline">
+					<Button
+						on:click={() => select('generator')}
+						size="sm"
+						variant={variant($data, 'generator')}
+					>
 						<span>Edit</span>
 						<CornerUpRight class="ml-2 h-4 w-4" />
 					</Button>
@@ -124,7 +136,7 @@
 						</Form.Control>
 						<Form.FieldErrors />
 					</Form.Field>
-					<Button on:click={() => select('table')} size="sm" variant="outline">
+					<Button on:click={() => select('table')} size="sm" variant={variant($data, 'table')}>
 						<span>Edit</span>
 						<CornerUpRight class="ml-2 h-4 w-4" />
 					</Button>
@@ -143,29 +155,13 @@
 			{#if s === 'description'}
 				<RichEditor bind:content={$data.description} />
 			{:else if s === 'generator'}
-				<Tabs.Root class="h-full flex flex-col" bind:value={generator_tab}>
-					<Tabs.List class="flex w-full items-stretch bg-zinc-100">
-						<Tabs.Trigger value="editor">Editor</Tabs.Trigger>
-						<Tabs.Trigger value="cases">Test Cases</Tabs.Trigger>
-					</Tabs.List>
-					{#if generator_tab === 'editor'}
-						<Editor
-							class="grow"
-							bind:value={$data.generator}
-							bind:view
-							lang={$data.generator_lang}
-							{onLangChange}
-						/>
-					{:else if generator_tab === 'cases'}
-						<Editor
-							class="grow"
-							bind:value={$data.generator}
-							bind:view
-							lang={$data.generator_lang}
-							{onLangChange}
-						/>
-					{/if}
-				</Tabs.Root>
+				<Editor
+					class="grow"
+					bind:value={$data.generator}
+					bind:view
+					lang={$data.generator_lang}
+					{onLangChange}
+				/>
 			{:else}
 				Selected an invalid field. This is a bug.
 			{/if}

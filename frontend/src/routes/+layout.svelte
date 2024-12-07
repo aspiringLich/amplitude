@@ -38,6 +38,10 @@
 	$: root = data.url.pathname.split('/')[1];
 </script>
 
+<svelte:head>
+	<title>Amplitude</title>
+</svelte:head>
+
 <div class="flex h-screen w-screen flex-row overflow-hidden" bind:this={root_element}>
 	<aside
 		class="flex min-w-52 max-w-52 flex-col items-stretch justify-between

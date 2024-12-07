@@ -4,15 +4,18 @@ import { javascript } from '@codemirror/lang-javascript';
 import { yaml } from '@codemirror/lang-yaml';
 import type { LanguageSupport } from '@codemirror/language';
 
-export type LangType = 'markup' | 'scripting' | 'compiled' | 'config';
 export type CodeFnReturn = { code: string; cursor: [number, number] | number };
 export type CodeFn = (fns: { [key: string]: string[] }) => CodeFnReturn;
-export type LangInfo = {
-	lang: LanguageSupport;
-	type: LangType;
-	code?: CodeFn;
-	// return [code, [cursorStart, cursorEnd]]
-};
+export type LangInfo =
+	| {
+			lang: LanguageSupport;
+			type: 'markup' | 'config';
+	  }
+	| {
+			lang: LanguageSupport;
+			type: 'scripting' | 'compiled';
+			code: CodeFn;
+	  };
 
 export const langs: { [key: string]: LangInfo } = {
 	markdown: {

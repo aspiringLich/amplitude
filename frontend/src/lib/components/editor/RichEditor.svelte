@@ -18,12 +18,12 @@
 		ItalicIcon,
 		CodeIcon,
 		FileCode2Icon,
-		Wand2Icon,
+		WandSparkles,
 		LinkIcon,
 		ListIcon,
 		ListOrderedIcon,
 		ListEndIcon,
-		ListCollapseIcon,
+		ListCollapseIcon
 	} from 'lucide-svelte';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 
@@ -159,7 +159,7 @@
 				variant={variant(editor.isActive('bold'))}
 				size="icon-xs"
 				title="Toggle Bold Mark"
-				disabled={!can((c) => c.toggleBold()) ?? editor}
+				disabled={!can((c) => c.toggleBold()) && editor != undefined}
 				on:click={execute((c) => c.toggleBold())}
 			>
 				<BoldIcon class="h-4 w-4" />
@@ -168,7 +168,7 @@
 				variant={variant(editor.isActive('italic'))}
 				size="icon-xs"
 				title="Toggle Italic Mark"
-				disabled={!can((c) => c.toggleItalic()) ?? editor}
+				disabled={!can((c) => c.toggleItalic()) && editor != undefined}
 				on:click={execute((c) => c.toggleItalic())}
 			>
 				<ItalicIcon class="h-4 w-4" />
@@ -177,7 +177,7 @@
 				variant={variant(editor.isActive('code'))}
 				size="icon-xs"
 				title="Toggle Code Mark"
-				disabled={!can((c) => c.toggleCode()) ?? editor}
+				disabled={!can((c) => c.toggleCode()) && editor != undefined}
 				on:click={execute((c) => c.toggleCode())}
 			>
 				<CodeIcon class="h-4 w-4" />
@@ -209,7 +209,7 @@
 						class="h-6 italic"
 						title="Insert Content"
 						data-mark="dropdown-insert-rich-editor"
-						disabled={!can((c) => c.insertContent('')) ?? editor}
+						disabled={!can((c) => c.insertContent('')) && editor != undefined}
 					>
 						Insert
 					</Button>
@@ -225,10 +225,9 @@
 								<DropdownMenu.Label>Language</DropdownMenu.Label>
 								<DropdownMenu.Separator />
 								<DropdownMenu.Item on:click={insertCodeBlock(undefined)}>
-									<Wand2Icon class="mr-2 h-4 w-4" />
+									<WandSparkles class="mr-2 h-4 w-4" />
 									<span>Autodetect</span>
 								</DropdownMenu.Item>
-
 								<DropdownMenu.Item on:click={insertCodeBlock('java')}>
 									<FileCode2Icon class="mr-2 h-4 w-4" />
 									<span>Java</span>
@@ -266,7 +265,7 @@
 					variant={variant(editor.isActive('bulletList'))}
 					size="icon-xs"
 					title="Toggle Bullet List"
-					disabled={!can((c) => c.toggleBulletList()) ?? editor}
+					disabled={!can((c) => c.toggleBulletList()) && editor != undefined}
 					on:click={execute((c) => c.toggleBulletList())}
 				>
 					<ListIcon class="h-4 w-4" />
@@ -275,30 +274,30 @@
 					variant={variant(editor.isActive('orderedList'))}
 					size="icon-xs"
 					title="Toggle Ordered List"
-					disabled={!can((c) => c.toggleOrderedList()) ?? editor}
+					disabled={!can((c) => c.toggleOrderedList()) && editor != undefined}
 					on:click={execute((c) => c.toggleOrderedList())}
 				>
 					<ListOrderedIcon class="h-4 w-4" />
 				</Button>
 				{#if width > 300 && editor.isActive('listItem')}
-				<Button
-					variant="outline"
-					size="icon-xs"
-					title="Sink List Item"
-					disabled={!can((c) => c.sinkListItem('listItem')) ?? editor}
-					on:click={execute((c) => c.sinkListItem('listItem'))}
-				>
-					<ListCollapseIcon class="h-4 w-4" />
-				</Button>
-				<Button
-					variant="outline"
-					size="icon-xs"
-					title="Lift List Item"
-					disabled={!can((c) => c.liftListItem('listItem')) ?? editor}
-					on:click={execute((c) => c.liftListItem('listItem'))}
-				>
-					<ListEndIcon class="h-4 w-4" />
-				</Button>
+					<Button
+						variant="outline"
+						size="icon-xs"
+						title="Sink List Item"
+						disabled={!can((c) => c.sinkListItem('listItem')) && editor != undefined}
+						on:click={execute((c) => c.sinkListItem('listItem'))}
+					>
+						<ListCollapseIcon class="h-4 w-4" />
+					</Button>
+					<Button
+						variant="outline"
+						size="icon-xs"
+						title="Lift List Item"
+						disabled={!can((c) => c.liftListItem('listItem')) && editor != undefined}
+						on:click={execute((c) => c.liftListItem('listItem'))}
+					>
+						<ListEndIcon class="h-4 w-4" />
+					</Button>
 				{/if}
 			{/if}
 		{/if}

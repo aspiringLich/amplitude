@@ -21,3 +21,4 @@
 		{/each}
 	</Select.Content>
 </Select.Root>
+<!-- TODO: icons for languages -->
