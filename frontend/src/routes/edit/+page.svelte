@@ -5,14 +5,14 @@
 	import RichEditor from '$src/lib/components/editor/RichEditor.svelte';
 	import Editor from '$src/lib/components/editor/Editor.svelte';
 	import { Play } from 'lucide-svelte';
-	
-	import { type ExerciseDraft } from '../create/+page.svelte';
+
+	import { drafts, selected_draft, type ExerciseDraft } from '../create/+page.svelte';
 	import { langs, type CodeFn } from '$src/lib/components/editor/lang';
 	import type { EditorView } from 'codemirror';
 	import GenerateDialog from '$src/routes/edit/GenerateDialog.svelte';
 	import ExerciseForm from '$src/routes/edit/ExerciseForm.svelte';
 	import type { Writable } from 'svelte/store';
-	
+
 	let view: EditorView;
 	const onLangChange = (lang: keyof typeof langs | undefined) => {
 		if (lang && view) {
@@ -39,18 +39,27 @@
 			view.focus();
 		}
 	};
-	
+
 	let data: Writable<ExerciseDraft>;
+
+	let selected = $selected_draft;
+	let exercise = $drafts[selected];
 </script>
 
-<Page center class="!flex-row !max-w-4xl grow items-stretch justify-stretch gap-1 p-2">
+<Page center class="!max-w-4xl grow !flex-row items-stretch justify-stretch gap-1 p-2">
 	<div class="card prose flex flex-col">
 		<header>
 			<h1>Edit Exercise</h1>
-			<span>Edit the exercise details below.</span>
+			{#if exercise}
+				<span>Edit the exercise details below.</span>
+			{:else}
+				<span>No exercise found</span>
+			{/if}
 		</header>
-		<section class="flex-shrink overflow-scroll flex flex-col !p-0">
-			<ExerciseForm bind:data />
+		<section class="flex flex-shrink flex-col overflow-scroll !p-0">
+			{#if exercise}
+				<ExerciseForm bind:data />
+			{/if}
 		</section>
 	</div>
 	<div class="card flex h-auto flex-grow flex-col">
@@ -61,11 +70,7 @@
 			{:else if s === 'generator'}
 				<div class="flex flex-row items-center justify-between border-b border-zinc-300 p-2">
 					<span class="flex flex-row">
-						<Button
-							variant="default"
-							size="default"
-							class=""
-						>
+						<Button variant="default" size="default" class="">
 							<Play class="mr-1 h-4 w-4" />
 							Generate
 						</Button>

@@ -20,7 +20,7 @@ const langSchema = z.enum(names);
 
 export const exerciseSchema = z.object({
 	title: z.string().trim().min(5).max(32),
-	description: z.string().max(6000).superRefine(sanitize_html),
+	description: z.string().min(20).max(6000).superRefine(sanitize_html),
 	// generator_lang: langSchema.optional(),
 	// generator: z.string().max(6000).optional(),
 	generated_table: z.array(literalSchema).max(100),
