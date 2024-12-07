@@ -94,7 +94,7 @@
 						<CornerUpRight class="ml-2 h-4 w-4" />
 					</Button>
 
-					<h6 class="text-bold col-span-2 mt-2 cursor-default">Test Cases</h6>
+					<h6 class="col-span-2 mt-2">Test Cases</h6>
 					<Form.Field {form} name="generator_lang" class="flex items-center">
 						<Form.Control let:attrs>
 							<Form.Label>Generator Language</Form.Label>

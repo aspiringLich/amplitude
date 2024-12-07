@@ -1,0 +1,11 @@
+form h4,
+form h5,
+form h6 {
+    @apply font-semibold cursor-default;
+}
+/* form h4::after,
+form h5::after,
+form h6::after {
+	@apply block border-b border-zinc-300;
+	content: ' ';
+} */
