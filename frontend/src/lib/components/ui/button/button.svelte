@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Button as ButtonPrimitive } from 'bits-ui';
-	import { cn } from '$lib/utils';
-	import { buttonVariants, type Props, type Events } from '.';
+	import { type Events, type Props, buttonVariants } from './index.js';
+	import { cn } from '$lib/utils.js';
 	import * as Tooltip from '$src/lib/components/ui/tooltip';
 
 	type $$Props = Props;
@@ -10,8 +10,8 @@
 	let className: $$Props['class'] = undefined;
 	export let variant: $$Props['variant'] = 'default';
 	export let size: $$Props['size'] = 'default';
-	export let tooltip: $$Props['tooltip'] = undefined;
 	export let builders: $$Props['builders'] = [];
+	export let tooltip: $$Props['tooltip'] = undefined;
 	export { className as class };
 </script>
 
@@ -34,7 +34,7 @@
 {:else}
 	<ButtonPrimitive.Root
 		{builders}
-		class="{cn(buttonVariants({ variant, size, className }))} "
+		class={cn(buttonVariants({ variant, size, className }))}
 		type="button"
 		{...$$restProps}
 		on:click

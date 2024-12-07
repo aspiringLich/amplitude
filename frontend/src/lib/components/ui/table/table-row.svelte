@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { cn } from "$lib/utils";
 	import type { HTMLAttributes } from "svelte/elements";
+	import { cn } from "$lib/utils.js";
 
 	type $$Props = HTMLAttributes<HTMLTableRowElement> & {
 		"data-state"?: unknown;
@@ -12,7 +12,7 @@
 
 <tr
 	class={cn(
-		"border-b data-[state=selected]:bg-muted",
+		"hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors",
 		className
 	)}
 	{...$$restProps}
