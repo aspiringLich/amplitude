@@ -5,4 +5,4 @@ run useradd -m runner -d /runner
 user runner
 workdir /runner
 
-entrypoint python ./runner.py
+entrypoint python ./main.py

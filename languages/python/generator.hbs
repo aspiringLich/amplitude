@@ -1,0 +1,36 @@
+import json
+import random
+
+class Context:
+    _context = []
+    hidden = False
+
+    from random import randint, random, randrange
+
+    def __init__(self):
+        self.hidden_cases = {{hidden_cases}}
+        self.visible_cases = {{visible_cases}}
+
+    def inputs(self, *args):
+        has = hasattr(self._context[-1], "output")
+        assert not has, "inputs() method has been called more than once"
+        self._context[-1]["input"] = args
+
+    def output(self, value):
+        has = hasattr(self._context[-1], "output")
+        assert not has, "output() method has been called more than once"
+        self._context[-1]["output"] = value
+
+from gen import gen
+
+random.seed(42)
+ctx = Context()
+
+for i in range({{generate_cases}}):
+    ctx._context.append({})
+    gen(ctx)
+    has = hasattr(ctx._context[-1], "output")
+    assert has, "output() method has not been called!"
+    # TODO: also check for number of inputs / arguments
+
+json.dumps(ctx._context)

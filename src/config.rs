@@ -13,7 +13,6 @@ pub struct DockerConfig {
     pub host: String,
     pub image_label: String,
     pub name_prefix: String,
-    pub languages: Vec<String>,
 }
 
 #[derive(Deserialize)]

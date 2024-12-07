@@ -8,7 +8,9 @@ EXERCISE EDITING UI
 
 CODE RUNNING / CODE EDITOR
 
--   [ ] Move language definitions into their own folder
+-   [x] Move language definitions into their own folder
+-   [ ] Add markdown files for their stuffs
+-   [ ] Code linting: run in browser when possible
 
 MANAGE EXERCISES / GROUPS / CLASSROOMS
 

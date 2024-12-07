@@ -9,13 +9,13 @@ edition = "2021"
 members = [".", "entity", "migration"]
 
 [workspace.dependencies]
-sea-orm = { version = "0.12.14", features = [
+sea-orm = { version = "1.1.2", features = [
     "sqlx-postgres",
     "runtime-tokio-rustls",
     "macros",
     "uuid",
 ] }
-serde = "1.0.197"
+serde = "1.0.215"
 serde_yaml = "0.9.32"
 tracing = "0.1.40"
 eyre = "0.6.2"
@@ -28,6 +28,7 @@ migration = { path = "migration" }
 sea-orm = { workspace = true }
 serde = { workspace = true }
 serde_yaml = { workspace = true }
+serde_json = "1.0.133"
 tracing = { workspace = true }
 eyre = { workspace = true }
 chrono = { workspace = true }
@@ -42,7 +43,6 @@ uuid = { version = "1.11.0", features = ["v7"] }
 dotenv = "0.15.0"
 google-oauth = "1.11.3"
 thiserror = "2.0.4"
-serde_json = "1.0.133"
 log = "0.4.22"
 nu-ansi-term = "0.50.1"
 docker-api = { git = "https://github.com/vv9k/docker-api-rs.git", rev = "b1f1891" }

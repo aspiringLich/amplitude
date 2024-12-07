@@ -5,8 +5,10 @@
 
 use std::{env, fs, sync::Arc, time::Duration};
 
+use app::Templates;
 use axum::Router;
 use docker_api::Docker;
+use langs::Languages;
 use sea_orm::{
     ConnectOptions, ConnectionTrait, Database, DatabaseConnection, DbBackend, DbErr, Statement,
 };
@@ -19,6 +21,7 @@ use crate::app::AppState;
 mod app;
 mod config;
 mod format;
+mod langs;
 mod routes;
 mod runner;
 mod views;
@@ -98,9 +101,10 @@ async fn main() -> eyre::Result<()> {
     let docker = Docker::new(&config.docker.host)?;
     tracing::info!("Connected to Docker Daemon at `{}`", &config.docker.host);
 
-    let mut handlebars = handlebars::Handlebars::new();
+    let langs = Languages::new()?;
+    let mut templates = Templates::new(handlebars::Handlebars::new());
     let runner_registry =
-        runner::generate_registry(&config.docker, &docker, &mut handlebars).await?;
+        runner::generate_registry(&config.docker, &docker, &langs, &mut templates).await?;
 
     let state = AppState {
         config,
@@ -108,6 +112,8 @@ async fn main() -> eyre::Result<()> {
         db: db.clone(),
         docker,
         runner_registry,
+        templates,
+        langs,
     };
 
     let state = Arc::new(state);
