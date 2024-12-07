@@ -74,7 +74,12 @@
 							<Play class="mr-1 h-4 w-4" />
 							Generate
 						</Button>
-						<Input placeholder="cases" class="ml-2 w-20" />
+						<Input
+							type="number"
+							placeholder="cases"
+							class="ml-2 w-20"
+							bind:value={$data.generate_cases}
+						/>
 					</span>
 					<GenerateDialog />
 				</div>
@@ -83,6 +88,7 @@
 					bind:value={$data.generator}
 					bind:view
 					lang={$data.generator_lang}
+					readonly={$data.generator_lang === undefined}
 					{onLangChange}
 				/>
 			{:else}

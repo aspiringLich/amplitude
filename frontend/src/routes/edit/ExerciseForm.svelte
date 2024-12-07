@@ -25,6 +25,26 @@
 		validators: zodClient(exerciseSchema),
 		onChange: update,
 		onError: (e) => toast.error(e.result.error.message),
+		onSubmit: (e) => {
+			$drafts[selected] = $data;
+		},
+		onResult(e) {
+			let res = e.result;
+			switch (res.type) {
+				case 'error':
+					console.error(res);
+					toast.error(res.error.message);
+					break;
+				case 'success':
+					toast.success('Exercise submitted!');
+					break;
+				case 'failure':
+					console.error(res);
+					toast.error(`Submission Failiure: ${res.status}`);
+					break;
+				case 'redirect':
+			}
+		},
 		dataType: 'json'
 	});
 	const { form: formData, enhance } = form;
@@ -49,57 +69,73 @@
 			</Form.Control>
 			<Form.FieldErrors />
 		</Form.Field>
-		<div class="grid flex-[1_0_auto] grid-cols-[6rem_1fr] gap-2">
-			<Form.Field {form} name="description" class="flex items-center">
+		<div class="grid flex-[1_0_auto] grid-cols-[6rem_1fr] gap-x-2 gap-y-1">
+			<Form.Field {form} name="description" class="contents">
 				<Form.Control let:attrs>
-					<Form.Label>Description</Form.Label>
+					<Form.Label class="flex items-center">Description</Form.Label>
 					<Input {...attrs} type="hidden" bind:value={$data.description} />
 				</Form.Control>
-				<Form.FieldErrors />
+				<Button
+					on:click={() => select('description')}
+					size="sm"
+					variant={variant($data, 'description')}
+					class="!mt-0"
+				>
+					<span>Edit</span>
+					<CornerUpRight class="ml-2 h-4 w-4" />
+				</Button>
+				<Form.FieldErrors class="col-span-2 !mt-0" />
 			</Form.Field>
-			<Button
-				on:click={() => select('description')}
-				size="sm"
-				variant={variant($data, 'description')}
-			>
-				<span>Edit</span>
-				<CornerUpRight class="ml-2 h-4 w-4" />
-			</Button>
 
 			<h6 class="col-span-2 mt-2">Test Cases</h6>
-			<Form.Field {form} name="generator_lang" class="flex items-center">
+
+			<Form.Field {form} name="generator_lang" class="contents">
 				<Form.Control let:attrs>
-					<Form.Label>Generator Language</Form.Label>
+					<Form.Label class="flex items-center">Generator Language</Form.Label>
 					<Input {...attrs} type="hidden" bind:value={$data.generator_lang} />
 				</Form.Control>
-				<Form.FieldErrors />
+				<LangSelect
+					bind:value={$data.generator_lang}
+					filter={({ type }) => type == 'scripting'}
+					class="!mt-0"
+				/>
+				<Form.FieldErrors class="col-span-2 !mt-0" />
 			</Form.Field>
-			<LangSelect bind:value={$data.generator_lang} filter={({ type }) => type == 'scripting'} />
-			<Form.Field {form} name="generator" class="flex items-center">
+			<Form.Field {form} name="generator" class="contents">
 				<Form.Control let:attrs>
-					<Form.Label>Generator</Form.Label>
+					<Form.Label class="flex items-center">Generator</Form.Label>
 					<Input {...attrs} type="hidden" bind:value={$data.generator} />
 				</Form.Control>
-				<Form.FieldErrors />
+				<Button
+					on:click={() => select('generator')}
+					size="sm"
+					variant={variant($data, 'generator')}
+					class="!mt-0"
+				>
+					<span>Edit</span>
+					<CornerUpRight class="ml-2 h-4 w-4" />
+				</Button>
+				<Form.FieldErrors class="col-span-2 !mt-0" />
 			</Form.Field>
-			<Button on:click={() => select('generator')} size="sm" variant={variant($data, 'generator')}>
-				<span>Edit</span>
-				<CornerUpRight class="ml-2 h-4 w-4" />
-			</Button>
-			<Form.Field {form} name="generated_table" class="flex items-center">
+			<Form.Field {form} name="generated_table" class="contents">
 				<Form.Control let:attrs>
-					<Form.Label>Test Cases</Form.Label>
+					<Form.Label class="flex items-center">Test Cases</Form.Label>
 					<Input {...attrs} type="hidden" bind:value={$data.generated_table} />
 				</Form.Control>
-				<Form.FieldErrors />
+				<Button
+					on:click={() => select('table')}
+					size="sm"
+					variant={variant($data, 'table')}
+					class="!mt-0"
+				>
+					<span>Edit</span>
+					<CornerUpRight class="ml-2 h-4 w-4" />
+				</Button>
+				<Form.FieldErrors class="col-span-2 !mt-0" />
 			</Form.Field>
-			<Button on:click={() => select('table')} size="sm" variant={variant($data, 'table')}>
-				<span>Edit</span>
-				<CornerUpRight class="ml-2 h-4 w-4" />
-			</Button>
 		</div>
 	</span>
 	<div class="flex flex-row-reverse gap-2 p-6 pt-4">
-		<Form.Button on:click={() => ($drafts[selected] = $data)}>Submit</Form.Button>
+		<Form.Button>Publish</Form.Button>
 	</div>
 </form>

@@ -8,6 +8,7 @@
 		selected_field?: string;
 		generator?: string;
 		generator_lang?: string;
+		generate_cases?: number;
 	};
 	export const drafts: Writable<ExerciseDraft[]> = local_store('create/drafts', []);
 </script>
@@ -27,10 +28,11 @@
 			e.push({
 				title: 'Untitled Exercise',
 				description: '',
-				generator_lang: undefined,
-				generator: undefined,
 				generated_table: [],
-				starting_code: ''
+				starting_code: '',
+				generator: undefined,
+				generator_lang: undefined,
+				generate_cases: 10,
 			});
 			return e;
 		});

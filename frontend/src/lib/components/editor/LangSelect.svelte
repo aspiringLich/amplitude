@@ -5,12 +5,17 @@
 
 	export let value: string | undefined = undefined;
 	export let filter: (lang: LangInfo) => boolean = () => true;
+	let className: string = '';
+	export { className as class };
 
 	let selected: Selected<string> = { value: value || '' };
 </script>
 
-<Select.Root selected={{ value, label: value }} onSelectedChange={(s) => s && (value = s.value)}>
-	<Select.Trigger class="w-[180px]">
+<Select.Root
+	selected={{ value, label: value }}
+	onSelectedChange={(s) => s && (value = s.value)}
+>
+	<Select.Trigger class="w-[180px] {className}">
 		<Select.Value placeholder="Select Language" />
 	</Select.Trigger>
 	<Select.Content>

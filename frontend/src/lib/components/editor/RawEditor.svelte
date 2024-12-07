@@ -10,7 +10,13 @@
 <script lang="ts">
 	import { createEventDispatcher, onDestroy, onMount } from 'svelte';
 	import { basicSetup } from 'codemirror';
-	import { EditorView, keymap, placeholder as placeholderExt } from '@codemirror/view';
+	import {
+		EditorView,
+		highlightSpecialChars,
+		keymap,
+		lineNumbers,
+		placeholder as placeholderExt
+	} from '@codemirror/view';
 	import { EditorState, StateEffect, type Extension, EditorSelection } from '@codemirror/state';
 	import { indentWithTab } from '@codemirror/commands';
 	import { indentUnit, type LanguageSupport } from '@codemirror/language';
@@ -148,11 +154,18 @@
 			EditorState.readOnly.of(readonly)
 		];
 
-		if (basic) extensions.push(basicSetup);
-		if (useTab) extensions.push(keymap.of([indentWithTab]));
 		if (placeholder) extensions.push(placeholderExt(placeholder));
 		if (lang) extensions.push(lang);
 		if (lineWrapping) extensions.push(EditorView.lineWrapping);
+
+		if (readonly) {
+			extensions.push(lineNumbers());
+			extensions.push(highlightSpecialChars());
+			return extensions;
+		}
+
+		if (basic) extensions.push(basicSetup);
+		if (useTab) extensions.push(keymap.of([indentWithTab]));
 
 		return extensions;
 	}

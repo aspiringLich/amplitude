@@ -23,7 +23,7 @@ export const exerciseSchema = z.object({
 	description: z.string().min(20).max(6000).superRefine(sanitize_html),
 	// generator_lang: langSchema.optional(),
 	// generator: z.string().max(6000).optional(),
-	generated_table: z.array(literalSchema).max(100),
+	generated_table: z.array(literalSchema).max(500),
 	starting_code: z.string().max(6000)
 });
 
