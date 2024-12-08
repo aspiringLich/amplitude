@@ -5,48 +5,31 @@ use eyre::Context;
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 
-use crate::app::Templates;
+use crate::{app::Templates, routes::exec::ExecRequest};
 
 use super::Runner;
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct ExecConfig<'a> {
-    pub content: &'a str,
-    pub inputs: Vec<Type>,
-    pub output: Type,
-    pub hidden_cases: u16,
-    pub visible_cases: u16,
-    pub generate_cases: u16,
+#[derive(Debug, Serialize)]
+#[serde(untagged)]
+pub enum GeneratorResult {
+    Success(GeneratorSuccess),
+    Err(ExecutionError),
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-#[serde(rename_all = "lowercase")]
-pub enum Type {
-    Int,
-    Float,
-    String,
-    // #[serde(untagged)]
-    // Array(Box<Type>, Option<u16>),
-    // TODO: array support
-    // map support?
-}
-
-type GeneratorResult = Result<GeneratorSuccess, ExecutionError>;
-
-#[derive(Debug, Deserialize, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct GeneratorCase {
     pub input: Vec<serde_json::Value>,
     pub output: serde_json::Value,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct GeneratorSuccess {
     pub cases: Vec<GeneratorCase>,
     pub stdout: String,
     pub stderr: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct ExecutionError {
     pub exit_code: isize,
     pub stdout: String,
@@ -58,7 +41,7 @@ impl Runner {
         &self,
         templates: &Templates,
         docker: &Docker,
-        cfg: &ExecConfig<'_>,
+        cfg: &ExecRequest,
     ) -> eyre::Result<GeneratorResult> {
         let container = self.create_container(docker).await?;
 
@@ -100,13 +83,13 @@ impl Runner {
             let cases: Vec<GeneratorCase> =
                 serde_json::from_slice(last_line).context("While parsing generator output")?;
 
-            Ok(Ok(GeneratorSuccess {
+            Ok(GeneratorResult::Success(GeneratorSuccess {
                 cases,
                 stdout: String::from_utf8_lossy_owned(stdout),
                 stderr: String::from_utf8_lossy_owned(stderr),
             }))
         } else {
-            Ok(Err(ExecutionError {
+            Ok(GeneratorResult::Err(ExecutionError {
                 exit_code,
                 stdout: String::from_utf8_lossy_owned(stdout),
                 stderr: String::from_utf8_lossy_owned(stderr),
@@ -126,9 +109,10 @@ mod test {
         app::Templates,
         config,
         langs::Languages,
+        routes::exec::Type,
         runner::{
             self,
-            exec::{ExecConfig, GeneratorCase, Type},
+            exec::{ExecRequest, GeneratorCase},
         },
     };
 
@@ -147,12 +131,13 @@ mod test {
                            \tctx.input(1, 1) \n\
                            \tctx.output(2)   \n";
 
-        let output = reg["python"]
+        let runner::exec::GeneratorResult::Success(output) = reg["python"]
             .run_generator(
                 &templates,
                 &docker,
-                &ExecConfig {
-                    content: gen,
+                &ExecRequest {
+                    language: "python".to_string(),
+                    content: gen.to_string(),
                     inputs: vec![Type::Int, Type::Int],
                     output: Type::Int,
                     hidden_cases: 0,
@@ -162,7 +147,9 @@ mod test {
             )
             .await
             .unwrap()
-            .expect("no error");
+        else {
+            panic!()
+        };
 
         let expected: Vec<GeneratorCase> = serde_json::from_value(json!([
             {

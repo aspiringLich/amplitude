@@ -12,6 +12,8 @@
 	import GenerateDialog from '$src/routes/edit/GenerateDialog.svelte';
 	import ExerciseForm from '$src/routes/edit/ExerciseForm.svelte';
 	import type { Writable } from 'svelte/store';
+	import { request } from '$src/lib/request';
+	import { toast } from 'svelte-sonner';
 
 	let view: EditorView;
 	const onLangChange = (lang: keyof typeof langs | undefined) => {
@@ -37,6 +39,39 @@
 				view.dispatch(t);
 			}
 			view.focus();
+		}
+	};
+
+	const generate = async () => {
+		const res = await request.post('/api/exec/gen', {
+			content: $data.generator,
+			language: $data.generator_lang,
+			inputs: [],
+			output: 'int',
+			hidden_cases: 0,
+			visible_cases: 0,
+			generate_cases: 10
+		});
+		if (res.ok) {
+			type Success = {
+				exit_code: undefined;
+				cases: { input: any[]; output: any }[];
+				stderr: string;
+				stdout: string;
+			};
+			type Failure = {
+				exit_code: number;
+				stderr: string;
+				stdout: string;
+			};
+			const json: Success | Failure = await res.json();
+			
+			if (json.exit_code !== undefined) {
+				toast.error(`Program exited unsuccessfully with exit code ${json.exit_code}`);
+			} else {
+				toast.success('Generated!');
+				console.log(res);
+			}
 		}
 	};
 
@@ -70,7 +105,7 @@
 			{:else if s === 'generator'}
 				<div class="flex flex-row items-center justify-between border-b border-zinc-300 p-2">
 					<span class="flex flex-row">
-						<Button variant="default" size="default" class="">
+						<Button variant="default" size="default" on:click={generate}>
 							<Play class="mr-1 h-4 w-4" />
 							Generate
 						</Button>

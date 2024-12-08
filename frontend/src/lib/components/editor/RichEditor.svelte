@@ -306,7 +306,7 @@
 
 <style lang="postcss">
 	:global(.tiptap) {
-		@apply prose prose-sm max-w-none;
+		@apply prose prose-sm;
 		@apply min-h-0 flex-[1_1_0] overflow-auto p-2;
 	}
 </style>

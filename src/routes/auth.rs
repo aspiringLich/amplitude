@@ -1,21 +1,15 @@
-use self::views::{
-    auth::{login, UserAvatar},
-    not_found,
-};
-
 use super::*;
-use crate::views::{unauthorized, Error};
 
-use axum::{
-    body::Body,
-    http::{Response, StatusCode},
-    routing::get,
-};
 use chrono::Utc;
 use entity::{google_user, sea_orm_active_enums::Account, user};
-use eyre::Context;
 use google_oauth::AsyncClient;
 use uuid::{NoContext, Timestamp, Uuid};
+
+pub fn routes() -> Router<AppState> {
+    Router::new()
+        .route("/google", post(google_login))
+        .route("/session", get(session))
+}
 
 #[derive(Deserialize)]
 struct GoogleCredentials {
@@ -85,10 +79,4 @@ async fn session(
         }
         None => Err(not_found("Session not found")),
     }
-}
-
-pub fn routes() -> Router<AppState> {
-    Router::new()
-        .route("/google", post(google_login))
-        .route("/session", get(session))
 }

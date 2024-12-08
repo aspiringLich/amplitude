@@ -21,7 +21,7 @@ use crate::{
     langs::{LangInfo, Languages},
 };
 
-mod exec;
+pub mod exec;
 
 pub struct Runner {
     pub image_id: String,

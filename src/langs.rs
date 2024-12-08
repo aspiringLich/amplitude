@@ -38,7 +38,7 @@ impl std::ops::Deref for Languages {
     }
 }
 
-#[derive(Debug, Clone, Copy, Deserialize)]
+#[derive(Debug, Clone, Copy, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum LangType {
     Scripting,

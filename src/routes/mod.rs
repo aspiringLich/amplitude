@@ -1,17 +1,31 @@
-use axum::{extract::State, routing::post, Json, Router};
-use serde::Deserialize;
+use axum::{
+    body::Body,
+    extract::State,
+    http::{Response, StatusCode},
+    routing::{get, post},
+    Json, Router,
+};
+use serde::{Deserialize, Serialize};
 use std::time::Duration;
-use tower_http::cors;
 
-use crate::views::{self, session::Session};
+use eyre::Context;
 
-mod auth;
+use crate::views::{
+    auth::{login, UserAvatar},
+    bad_request, forbidden, internal, not_found,
+    session::Session,
+    unauthorized, Error,
+};
+
+pub mod auth;
+pub mod exec;
 
 pub type AppState = std::sync::Arc<crate::AppState>;
 
 pub fn routes() -> Router<AppState> {
     Router::new()
         .nest("/auth", auth::routes())
+        .nest("/exec", exec::routes())
         .layer(tower_http::trace::TraceLayer::new_for_http())
-        .layer(cors::CorsLayer::very_permissive())
+        .layer(tower_http::cors::CorsLayer::very_permissive())
 }

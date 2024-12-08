@@ -19,11 +19,11 @@ class Context:
         assert ctx._context[-1]["output"] is None, "output() method has been called more than once"
         self._context[-1]["output"] = value
 
-import gen
 
 random.seed(42)
 ctx = Context()
 
+import gen
 for i in range({{generate_cases}}):
     ctx._context.append({"input": None, "output": None})
     gen.gen(ctx)
