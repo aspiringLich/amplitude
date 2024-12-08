@@ -13,17 +13,20 @@ use docker_api::{
     Container, Docker,
 };
 use futures::{stream::StreamExt, Stream};
-use handlebars::Handlebars;
 use uuid::Uuid;
 
-use crate::{app::Templates, config::DockerConfig, langs::{LangInfo, Languages}};
+use crate::{
+    app::Templates,
+    config::DockerConfig,
+    langs::{LangInfo, Languages},
+};
 
 mod exec;
 
 pub struct Runner {
     pub image_id: String,
     pub network_id: String,
-    pub container_name_base: String,
+    pub container_name_prefix: String,
     pub lang: LangInfo,
 }
 
@@ -69,7 +72,12 @@ pub async fn generate_registry(
         templates.register_lang(lang)?;
     }
 
-    let registry: BTreeMap<String, Runner> = langs.iter().map(|l| &l.name).cloned().zip(runners).collect();
+    let registry: BTreeMap<String, Runner> = langs
+        .iter()
+        .map(|l| &l.name)
+        .cloned()
+        .zip(runners)
+        .collect();
     Ok(registry)
 }
 
@@ -117,8 +125,8 @@ impl Runner {
         Ok(Self {
             image_id,
             network_id: network_id.to_owned(),
-            container_name_base: cfg.name_prefix.clone() + lang_name + "-",
-            lang: lang.clone()
+            container_name_prefix: cfg.container_name_prefix.clone(),
+            lang: lang.clone(),
         })
     }
 
@@ -131,14 +139,10 @@ impl Runner {
             .memory(16384 * 1024)
             .network_mode(&self.network_id)
             .privileged(false)
-            .name(self.container_name_base.clone() + &uuid.to_string());
+            .name(self.container_name_prefix.clone() + &self.lang.name + &uuid.to_string()); // container names must be unique
         let container = docker.containers().create(&opts.build()).await?;
 
         Ok(container)
-    }
-
-    fn get_container(&self, docker: &Docker) -> Container {
-        docker.containers().get(&self.image_id)
     }
 }
 

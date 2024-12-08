@@ -3,6 +3,7 @@ use std::path::Path;
 use docker_api::Docker;
 use handlebars::{Handlebars, Template, TemplateError};
 use sea_orm::DatabaseConnection;
+use serde::Serialize;
 
 use crate::{
     config::{Config, Secrets},
@@ -35,15 +36,19 @@ impl Templates {
             .register_template_file(&format!("{name}/generator"), lang.generator_path())?;
         self.handlebars
             .register_template_file(&format!("{name}/runner"), lang.runner_path())?;
-        
+
         Ok(())
     }
-    
-    pub fn get_generator(&self, name: &str) -> Option<&Template> {
-        self.handlebars.get_template(&format!("{name}/generator"))
-    }
-    
-    pub fn get_runner(&self, name: &str) -> Option<&Template> {
-        self.handlebars.get_template(&format!("{name}/runner"))
+
+    pub fn render_generator<T>(
+        &self,
+        lang: &LangInfo,
+        data: &T,
+    ) -> Result<String, handlebars::RenderError>
+    where
+        T: Serialize,
+    {
+        let name = &lang.name;
+        self.handlebars.render(&format!("{name}/generator"), data)
     }
 }

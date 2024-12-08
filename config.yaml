@@ -6,5 +6,6 @@ docker:
   host: unix:///var/run/docker.sock
   image_label: amplitude-runner # TODO: remove
   name_prefix: amplitude-runner/
+  container_name_prefix: amplitude-runner-
   # languages:
   #   - python

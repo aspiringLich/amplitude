@@ -2,6 +2,8 @@
 #![feature(iter_map_windows)]
 #![feature(decl_macro)]
 #![feature(async_closure)]
+#![feature(slice_split_once)]
+#![feature(string_from_utf8_lossy_owned)]
 
 use std::{env, fs, sync::Arc, time::Duration};
 

@@ -13,6 +13,7 @@ pub struct DockerConfig {
     pub host: String,
     pub image_label: String,
     pub name_prefix: String,
+    pub container_name_prefix: String,
 }
 
 #[derive(Deserialize)]
