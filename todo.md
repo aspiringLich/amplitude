@@ -10,6 +10,7 @@ EXERCISE EDITING UI
 -   [x] Make the error messages for the forms look better
 -   [ ] Write the solution & have the generator only generate inputs
 -   [ ] Get rid of melt ui-- shadcn does it all for us already
+-   [ ] Replace buttons with a `ToggleGroup`
 
 CODE RUNNING / CODE EDITOR
 

@@ -44,14 +44,14 @@ async fn gen(
 
     let res = state.runner_registry[lang]
         .run_generator(&state.templates, &state.docker, &req)
-        .await
-        .map_err(internal)?;
+        .await?;
     Ok(Json(res))
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Type {
+    Bool,
     Int,
     Float,
     String,

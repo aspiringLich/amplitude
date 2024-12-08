@@ -149,7 +149,7 @@
 		lang: LanguageSupport | null | undefined
 	): Extension[] {
 		const extensions: Extension[] = [
-			indentUnit.of(' '.repeat(tabSize)),
+			indentUnit.of(useTab ? '\t' : ' '.repeat(tabSize)),
 			EditorView.editable.of(editable),
 			EditorState.readOnly.of(readonly)
 		];

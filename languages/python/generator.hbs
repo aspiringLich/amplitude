@@ -4,12 +4,14 @@ import random
 class Context:
     _context = []
     hidden = False
+    hidden_cases = {{hidden_cases}}
+    visible_cases = {{visible_cases}}
+    i = 0
 
     from random import randint, random, randrange
 
     def __init__(self):
-        self.hidden_cases = {{hidden_cases}}
-        self.visible_cases = {{visible_cases}}
+        pass
 
     def input(self, *args):
         assert ctx._context[-1]["input"] is None, "inputs() method has been called more than once"
@@ -19,15 +21,16 @@ class Context:
         assert ctx._context[-1]["output"] is None, "output() method has been called more than once"
         self._context[-1]["output"] = value
 
-
-random.seed(42)
 ctx = Context()
 
 import gen
 for i in range({{generate_cases}}):
+    if (i == {{visible_cases}}):
+        ctx.hidden = True
+
+    ctx.i = i
     ctx._context.append({"input": None, "output": None})
     gen.gen(ctx)
     assert ctx._context[-1]["output"] is not None, "output() method has not been called!"
-    # TODO: also check for number of inputs / arguments
 
 print(json.dumps(ctx._context))

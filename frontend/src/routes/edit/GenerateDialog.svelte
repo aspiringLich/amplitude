@@ -5,7 +5,7 @@
 </script>
 
 <Dialog.Root>
-	<Dialog.Trigger class={buttonVariants({ variant: 'outline', size: 'icon' }) + ' rounded-full'}>
+	<Dialog.Trigger class={buttonVariants({ variant: 'outline', size: 'icon' })}>
 		<Info class="h-4 w-4" />
 	</Dialog.Trigger>
 	<Dialog.Content>
@@ -16,9 +16,7 @@
 					Aside from manually specifying test cases, you have the option of algorithmically
 					generating them with a generator function.
 				</p>
-				<p>
-                    blah blah blah yap yap yap
-                </p>
+				<p>blah blah blah yap yap yap</p>
 			</Dialog.Description>
 		</Dialog.Header>
 	</Dialog.Content>

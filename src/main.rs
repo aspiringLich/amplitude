@@ -1,4 +1,3 @@
-#![feature(try_trait_v2)]
 #![feature(iter_map_windows)]
 #![feature(decl_macro)]
 #![feature(async_closure)]

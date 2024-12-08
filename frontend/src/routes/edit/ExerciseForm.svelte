@@ -5,14 +5,12 @@
 	import LangSelect from '$src/lib/components/editor/LangSelect.svelte';
 	import { CornerUpRight } from 'lucide-svelte';
 
-	import { drafts, selected_draft, type ExerciseDraft } from '../create/+page.svelte';
-	import { exerciseSchema, type Exercise } from './schema';
+	import { drafts, selected_draft } from '../create/+page.svelte';
+	import { exerciseSchema } from './schema';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { debounce } from '@melt-ui/svelte/internal/helpers';
-	import { superForm, type SuperValidated } from 'sveltekit-superforms';
+	import { superForm } from 'sveltekit-superforms';
 	import { toast } from 'svelte-sonner';
-	import { langs, type CodeFn } from '$src/lib/components/editor/lang';
-	import type { EditorView } from 'codemirror';
 
 	let selected = $selected_draft;
 	let exercise = $drafts[selected];
@@ -87,6 +85,8 @@
 				<Form.FieldErrors class="col-span-2 !mt-0" />
 			</Form.Field>
 
+			<h6 class="col-span-2 mt-2">Solution</h6>
+			
 			<h6 class="col-span-2 mt-2">Test Cases</h6>
 
 			<Form.Field {form} name="generator_lang" class="contents">

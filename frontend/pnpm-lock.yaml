@@ -164,6 +164,9 @@ importers:
       svelte-check:
         specifier: 4.1.1
         version: 4.1.1(svelte@4.2.19)(typescript@5.4.2)
+      svelte-dnd-action:
+        specifier: ^0.9.52
+        version: 0.9.52(svelte@4.2.19)
       svelte-sonner:
         specifier: ^0.3.19
         version: 0.3.19(svelte@4.2.19)
@@ -1784,6 +1787,11 @@ packages:
     peerDependencies:
       svelte: ^4.0.0 || ^5.0.0-next.0
       typescript: '>=5.0.0'
+
+  svelte-dnd-action@0.9.52:
+    resolution: {integrity: sha512-f841HB5PCcvp21jsMkxSXCXcsJcGmIPMguN6iI1gXqP9Owcb47+ZUIE5ETUzNJntE9h7dm1wFj2Bm51hRtQ7Lw==}
+    peerDependencies:
+      svelte: '>=3.23.0 || ^5.0.0-next.0'
 
   svelte-hmr@0.15.3:
     resolution: {integrity: sha512-41snaPswvSf8TJUhlkoJBekRrABDXDMdpNpT2tfHIv4JuhgvHqLMhEPGtaQn0BmbNSTkuz2Ed20DF2eHw0SmBQ==}
@@ -3488,6 +3496,10 @@ snapshots:
       typescript: 5.4.2
     transitivePeerDependencies:
       - picomatch
+
+  svelte-dnd-action@0.9.52(svelte@4.2.19):
+    dependencies:
+      svelte: 4.2.19
 
   svelte-hmr@0.15.3(svelte@4.2.19):
     dependencies:

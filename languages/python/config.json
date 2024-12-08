@@ -1,3 +1,5 @@
 {
-    "type": "scripting"
+    "type": "scripting",
+    "variable_length_arrays": true,
+    "complex_types": []
 }

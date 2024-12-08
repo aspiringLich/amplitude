@@ -4,7 +4,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import RichEditor from '$src/lib/components/editor/RichEditor.svelte';
 	import Editor from '$src/lib/components/editor/Editor.svelte';
-	import { Play } from 'lucide-svelte';
+	import { Play, RefreshCcw } from 'lucide-svelte';
 
 	import { drafts, selected_draft, type ExerciseDraft } from '../create/+page.svelte';
 	import { langs, type CodeFn } from '$src/lib/components/editor/lang';
@@ -14,32 +14,41 @@
 	import type { Writable } from 'svelte/store';
 	import { request } from '$src/lib/request';
 	import { toast } from 'svelte-sonner';
+	import TestCaseEditor from '$src/routes/edit/TestCaseEditor.svelte';
 
 	let view: EditorView;
+	let prev_lang: string | number;
 	const onLangChange = (lang: keyof typeof langs | undefined) => {
-		if (lang && view) {
+		if (lang && view && prev_lang !== lang && !$data.generator?.trim()) {
 			console.assert(langs[lang].type == 'scripting');
-			const code_fn: CodeFn = (langs[lang] as any).code; // fine b/c the only fields available to the lang editor are scripting langs
-			if (!code_fn) return;
-			const { code, cursor } = code_fn({
-				gen: ['ctx']
-			});
-			if (typeof cursor === 'number') {
-				const t = view.state.update({
-					changes: { from: 0, to: view.state.doc.length, insert: code },
-					selection: { anchor: cursor, head: cursor }
-				});
-				view.dispatch(t);
-			} else {
-				const [anchor, head] = cursor;
-				const t = view.state.update({
-					changes: { from: 0, to: view.state.doc.length, insert: code },
-					selection: { anchor, head }
-				});
-				view.dispatch(t);
-			}
-			view.focus();
+			prev_lang = lang;
+			reset();
 		}
+	};
+
+	const reset = () => {
+		if (!$data.generator_lang) return;
+
+		const code_fn: CodeFn = (langs[$data.generator_lang] as any).code; // fine b/c the only fields available to the lang editor are scripting langs
+		if (!code_fn) return;
+		const { code, cursor } = code_fn({
+			gen: ['ctx']
+		});
+		if (typeof cursor === 'number') {
+			const t = view.state.update({
+				changes: { from: 0, to: view.state.doc.length, insert: code },
+				selection: { anchor: cursor, head: cursor }
+			});
+			view.dispatch(t);
+		} else {
+			const [anchor, head] = cursor;
+			const t = view.state.update({
+				changes: { from: 0, to: view.state.doc.length, insert: code },
+				selection: { anchor, head }
+			});
+			view.dispatch(t);
+		}
+		view.focus();
 	};
 
 	const generate = async () => {
@@ -65,7 +74,7 @@
 				stdout: string;
 			};
 			const json: Success | Failure = await res.json();
-			
+
 			if (json.exit_code !== undefined) {
 				toast.error(`Program exited unsuccessfully with exit code ${json.exit_code}`);
 			} else {
@@ -116,7 +125,19 @@
 							bind:value={$data.generate_cases}
 						/>
 					</span>
-					<GenerateDialog />
+					<span class="flex flex-row justify-end gap-2">
+						<Button
+							variant="outline"
+							size="icon"
+							tooltip="Reset code"
+							disabled={$data.generator_lang === undefined}
+							on:click={reset}
+						>
+							<!-- TODO: spin?? -->
+							<RefreshCcw class="h-4 w-4" />
+						</Button>
+						<GenerateDialog />
+					</span>
 				</div>
 				<Editor
 					class="grow"
@@ -126,6 +147,8 @@
 					readonly={$data.generator_lang === undefined}
 					{onLangChange}
 				/>
+			{:else if s === 'table'}
+				<TestCaseEditor />
 			{:else}
 				Selected an invalid field. This is a bug.
 			{/if}

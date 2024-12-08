@@ -60,9 +60,4 @@ export const langs: { [key: string]: LangInfo } = {
 	}
 };
 
-export const names: ['markdown', 'python', 'javascript', 'yaml'] = [
-	'markdown',
-	'python',
-	'javascript',
-	'yaml'
-];
+export const names: ['markdown', 'python', 'javascript', 'yaml'] = Object.keys(langs) as any;

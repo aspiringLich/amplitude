@@ -80,8 +80,15 @@ impl Runner {
                 .trim_ascii_end()
                 .rsplit_once(|b| *b == b'\n')
                 .unwrap_or((b"", stdout.trim_ascii_end()));
+
             let cases: Vec<GeneratorCase> =
-                serde_json::from_slice(last_line).context("While parsing generator output")?;
+                serde_json::from_slice(last_line).with_context(|| {
+                    format!(
+                        "While parsing generator output:\n{}\n{}",
+                        String::from_utf8_lossy(&stdout),
+                        String::from_utf8_lossy(&stderr)
+                    )
+                })?;
 
             Ok(GeneratorResult::Success(GeneratorSuccess {
                 cases,
