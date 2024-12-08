@@ -20,6 +20,8 @@
 	import { Plus, Trash2 } from 'lucide-svelte';
 
 	import Page from '$lib/Page.svelte';
+	import { fly } from 'svelte/transition';
+	import { flip } from 'svelte/animate';
 
 	let _drafts = $drafts;
 
@@ -28,11 +30,14 @@
 			e.push({
 				title: 'Untitled Exercise',
 				description: '',
+				function_name: '',
+				input: [],
+				output: '',
 				generated_table: [],
 				starting_code: '',
 				generator: undefined,
 				generator_lang: undefined,
-				generate_cases: 10,
+				generate_cases: 10
 			});
 			return e;
 		});
@@ -62,10 +67,10 @@
 				uploaded to your account and become available to other users.
 			</p>
 		</header>
-		<section class="shrink">
-			<Table.Root class="my-0 select-none">
+		<section class="flex-pass">
+			<Table.Root class="flex-pass my-0 select-none items-stretch">
 				<Table.Header>
-					<Table.Row class="hover:bg-background">
+					<Table.Row class="hover:bg-background block">
 						<Table.Head class="flex items-center justify-between">
 							Your Drafts
 							<Tooltip.Root>
@@ -84,26 +89,28 @@
 						</Table.Head>
 					</Table.Row>
 				</Table.Header>
-				<Table.Body>
+				<Table.Body class="flex-pass max-h-96 overflow-scroll">
 					{#each _drafts as ex, i}
-						<Table.Row class="hover:bg-muted/50 flex items-center justify-between">
-							<a class="block w-full no-underline" href="/edit" on:click={() => select_draft(i)}>
-								<Table.Cell class="relative w-full">
-									{ex?.title}
-								</Table.Cell>
-							</a>
-							<Button
-								on:click={(e) => {
-									e.stopImmediatePropagation();
-									delete_draft(i);
-								}}
-								class="mr-6"
-								variant="line-destructive"
-								size="icon-xs"
-							>
-								<Trash2 class="h-4 w-4" />
-							</Button>
-						</Table.Row>
+						<span out:fly={{ y: -50, duration: 200 }} >
+							<Table.Row class="hover:bg-muted/50 flex items-center justify-between">
+								<a class="block w-full no-underline" href="/edit" on:click={() => select_draft(i)}>
+									<Table.Cell class="relative w-full">
+										{ex?.title}
+									</Table.Cell>
+								</a>
+								<Button
+									on:click={(e) => {
+										e.stopImmediatePropagation();
+										delete_draft(i);
+									}}
+									class="mr-6"
+									variant="line-destructive"
+									size="icon-xs"
+								>
+									<Trash2 class="h-4 w-4" />
+								</Button>
+							</Table.Row>
+						</span>
 					{:else}
 						<Table.Row>
 							<Table.Cell class="text-muted-foreground italic" colspan={2}>

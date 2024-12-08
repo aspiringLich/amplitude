@@ -76,4 +76,8 @@
 	body {
 		@apply bg-background text-foreground;
 	}
+	
+	.flex-pass {
+		@apply flex flex-col shrink overflow-y-scroll;
+	}
 }

@@ -91,7 +91,7 @@
 </script>
 
 <Page center class="!max-w-4xl grow !flex-row items-stretch justify-stretch gap-1 p-2">
-	<div class="card prose flex flex-col">
+	<div class="card prose flex flex-col !overflow-visible">
 		<header>
 			<h1>Edit Exercise</h1>
 			{#if exercise}
@@ -100,44 +100,36 @@
 				<span>No exercise found</span>
 			{/if}
 		</header>
-		<section class="flex flex-shrink flex-col overflow-scroll !p-0">
+		<section class="flex flex-shrink flex-col overflow-y-scroll !p-0">
 			{#if exercise}
 				<ExerciseForm bind:data />
 			{/if}
 		</section>
 	</div>
-	<div class="card flex h-auto flex-grow flex-col">
+	<div class="card flex h-auto flex-grow flex-col flex-shrink !max-w-none">
 		{#if data && $data.selected_field}
 			{@const s = $data.selected_field}
 			{#if s === 'description'}
 				<RichEditor bind:content={$data.description} />
 			{:else if s === 'generator'}
-				<div class="flex flex-row items-center justify-between border-b border-zinc-300 p-2">
-					<span class="flex flex-row">
-						<Button variant="default" size="default" on:click={generate}>
-							<Play class="mr-1 h-4 w-4" />
-							Generate
-						</Button>
-						<Input
-							type="number"
-							placeholder="cases"
-							class="ml-2 w-20"
-							bind:value={$data.generate_cases}
-						/>
-					</span>
-					<span class="flex flex-row justify-end gap-2">
-						<Button
-							variant="outline"
-							size="icon"
-							tooltip="Reset code"
-							disabled={$data.generator_lang === undefined}
-							on:click={reset}
-						>
-							<!-- TODO: spin?? -->
-							<RefreshCcw class="h-4 w-4" />
-						</Button>
-						<GenerateDialog />
-					</span>
+				<div class="flex flex-row items-center justify-between gap-2 border-b border-zinc-300 p-2">
+					<Button variant="default" size="default" on:click={generate}>
+						<Play class="mr-1 h-4 w-4" />
+						Generate
+					</Button>
+					<Input type="number" placeholder="cases" class="w-20" bind:value={$data.generate_cases} />
+					<span class="grow" />
+					<Button
+						variant="outline"
+						size="icon"
+						tooltip="Reset code"
+						disabled={$data.generator_lang === undefined}
+						on:click={reset}
+					>
+						<!-- TODO: spin?? -->
+						<RefreshCcw class="h-4 w-4" />
+					</Button>
+					<GenerateDialog />
 				</div>
 				<Editor
 					class="grow"

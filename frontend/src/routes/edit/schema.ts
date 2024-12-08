@@ -35,8 +35,8 @@ export const exerciseSchema = z.object({
 		.min(1)
 		.max(50)
 		.regex(/[\w_][\w\d_]*/, 'Function name must be composed of characters [a-zA-Z0-9_]'),
-	inputs: z.array(typeSchema).max(8),
-	outputs: typeSchema,
+	input: z.array(typeSchema).max(8),
+	output: typeSchema,
 	starting_code: z.string().max(6000).optional(),
 
 	generator_lang: langSchema

@@ -14,7 +14,7 @@
 	>
 		<slot />
 	</div>
-</main>
+</main>	
 
 <style lang="postcss">
 	.center {
@@ -26,6 +26,6 @@
 	}
 	
 	.center div > :global(*) {
-		@apply flex flex-col shrink max-h-full overflow-scroll max-w-xl;
+		@apply flex flex-col shrink max-h-full overflow-y-scroll max-w-xl;
 	}
 </style>

@@ -58,8 +58,8 @@
 	};
 </script>
 
-<form method="POST" use:enhance class="flex flex-shrink flex-col overflow-scroll">
-	<span class="flex flex-shrink flex-col overflow-scroll border-y border-zinc-300 px-6 py-4">
+<form method="POST" use:enhance class="flex flex-shrink flex-col overflow-y-scroll">
+	<span class="flex flex-shrink flex-col overflow-y-scroll border-y border-zinc-300 px-6 py-4">
 		<Form.Field {form} name="title">
 			<Form.Control let:attrs>
 				<Form.Label>Title</Form.Label>
