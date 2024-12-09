@@ -6,7 +6,7 @@ EXERCISE EDITING UI
     -    Add "teacher" option to account & make auth switching route
 -   [ ] Login--Allow refreshing google name / pfp
 
--   [ ] Save editor state instead of just the contents
+-   [x] Save editor state instead of just the contents
 -   [ ] Better sizing for content pages
 -   [x] Make the error messages for the forms look better
 -   [ ] Write the solution & have the generator only generate inputs

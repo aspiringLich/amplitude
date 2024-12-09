@@ -3,7 +3,7 @@
 }
 
 .tiptap pre {
-	@apply my-1 rounded bg-zinc-100 p-1;
+	@apply my-1 rounded bg-zinc-100 p-1 flex overflow-x-scroll !whitespace-pre;
 }
 
 .tiptap a {

@@ -60,3 +60,14 @@ export const flyAndScale = (
 		easing: cubicOut
 	};
 };
+
+export const sanitize_html = async (arg: string) => {
+	const sanitizeHtml = await import('sanitize-html');
+	return sanitizeHtml.default(arg);
+};
+
+let id = 0;
+
+export const get_id = () => {
+	return id++;
+};

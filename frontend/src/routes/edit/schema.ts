@@ -1,6 +1,7 @@
 import { names, langs } from '$src/lib/components/editor/lang';
+import { sanitize_html } from '$src/lib/utils';
 import type { Infer, SuperValidated } from 'sveltekit-superforms';
-import { z, type RefinementCtx } from 'zod';
+import { z } from 'zod';
 
 const typeSchema = z
 	.string()
@@ -11,11 +12,6 @@ const typeSchema = z
 		'Invalid type syntax'
 	); // TODO: match capturing groups & dynamically validate with language config
 
-const sanitize_html = async (arg: string, _: RefinementCtx) => {
-	const sanitizeHtml = await import('sanitize-html');
-	return sanitizeHtml.default(arg);
-};
-// TODO: move this to a util file and make sure its used when rendering with @html
 
 const literalSchema = z.union([
 	z.string().max(1000, 'Strings may not be longer than 1000 bytes'),

@@ -2,10 +2,11 @@
 	import { langs } from '$src/lib/components/editor/lang';
 	import type { EditorView } from 'codemirror';
 	import RawEditor from './RawEditor.svelte';
-	import { onDestroy } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
+	import { EditorState } from '@codemirror/state';
 
-	export let value: string | null | undefined;
 	export let lang: keyof typeof langs | undefined = undefined;
+	export let initialStateJSON: any | undefined = undefined;
 	export { className as class };
 	let className: string = '';
 
@@ -14,23 +15,23 @@
 	export let readonly: boolean = false;
 	$: editable = !readonly;
 
-	export let onChange: (value: string) => void = () => {};
-	export let onLangChange: (lang: keyof typeof langs | undefined) => void = () => {};
-
-	$: onLangChange(lang);
-
 	onDestroy(() => {
 		view?.destroy();
+	});
+	
+	onMount(() => {
+		console.log(initialStateJSON)
+		if (initialStateJSON) view.setState(EditorState.fromJSON(initialStateJSON));
 	});
 </script>
 
 <RawEditor
-	bind:value
 	bind:view
 	bind:readonly
 	bind:editable
 	lang={lang && langs[lang] ? langs[lang].lang : undefined}
 	class={className}
 	useTab={true}
-	on:change={(e) => onChange(e.detail)}
+	on:change
+	on:transactions
 />

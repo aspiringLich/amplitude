@@ -17,13 +17,20 @@
 		lineNumbers,
 		placeholder as placeholderExt
 	} from '@codemirror/view';
-	import { EditorState, StateEffect, type Extension, EditorSelection } from '@codemirror/state';
+	import {
+		EditorState,
+		StateEffect,
+		type Extension,
+		EditorSelection,
+		Transaction
+	} from '@codemirror/state';
 	import { indentWithTab } from '@codemirror/commands';
 	import { indentUnit, type LanguageSupport } from '@codemirror/language';
 
 	let classes = '';
 	export { classes as class };
-	export let value: string | null | undefined = '';
+	let value: string | null | undefined = '';
+	export let initialState: EditorState | undefined = undefined;
 
 	export let basic = true;
 	export let theme: Extension | null | undefined = undefined;
@@ -39,7 +46,8 @@
 	export let readonly = false;
 	export let placeholder: string | HTMLElement | null | undefined = undefined;
 
-	const dispatch = createEventDispatcher<{ change: string }>();
+	const dispatch_change = createEventDispatcher<{ change: string }>();
+	const dispatch_transactions = createEventDispatcher<{ transactions: readonly Transaction[] }>();
 
 	export let view: EditorView = undefined as any;
 
@@ -51,6 +59,7 @@
 	let first_update = true;
 
 	import { debounce } from '@melt-ui/svelte/internal/helpers';
+	import Editor from '$src/lib/components/editor/Editor.svelte';
 
 	$: state_extensions = [
 		...get_base_extensions(
@@ -67,7 +76,7 @@
 		...extensions
 	];
 
-	$: view && update(value);
+	// $: view && update(value);
 	$: view && state_extensions && reconfigure();
 
 	onMount(() => {
@@ -81,11 +90,12 @@
 
 		return new EditorView({
 			parent: element,
-			state: create_editor_state(value),
-			dispatch(transaction: any) {
-				view.update([transaction]);
+			state: create_editor_state(initialState || value),
+			dispatchTransactions(transactions: readonly Transaction[]) {
+				view.update(transactions);
+				dispatch_transactions('transactions', transactions);
 
-				if (!update_from_prop && transaction.docChanged) {
+				if (!update_from_prop && transactions.some((t) => t.docChanged)) {
 					on_change();
 				}
 			}
@@ -128,14 +138,19 @@
 		update_from_state = true;
 
 		value = new_value;
-		dispatch('change', value ?? '');
+		dispatch_change('change', value ?? '');
 	}
 
-	function create_editor_state(value: string | null | undefined): EditorState {
-		return EditorState.create({
-			doc: value ?? undefined,
-			extensions: state_extensions
-		});
+	function create_editor_state(value: string | any | null | undefined): EditorState {
+		if (typeof value == 'string') {
+			return EditorState.create({
+				doc: value ?? undefined,
+				extensions: state_extensions
+			});
+		} else if (value) {
+			return EditorState.fromJSON(value, { extensions: state_extensions });
+		}
+		return EditorState.create({ extensions: state_extensions });
 	}
 
 	function get_base_extensions(

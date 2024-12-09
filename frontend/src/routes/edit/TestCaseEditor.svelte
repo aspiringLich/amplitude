@@ -1,9 +1,5 @@
 <script lang="ts" context="module">
-	let id = 0;
-
-	export const get_id = () => {
-		return id++;
-	};
+	
 </script>
 
 <script lang="ts">

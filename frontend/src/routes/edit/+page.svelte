@@ -15,8 +15,9 @@
 	import { request } from '$src/lib/request';
 	import { toast } from 'svelte-sonner';
 	import TestCaseEditor from '$src/routes/edit/TestCaseEditor.svelte';
+	import { onMount } from 'svelte';
+	import { EditorState } from '@codemirror/state';
 
-	let view: EditorView;
 	let prev_lang: string | number;
 	const onLangChange = (lang: keyof typeof langs | undefined) => {
 		if (lang && view && prev_lang !== lang && !$data.generator?.trim()) {
@@ -60,7 +61,7 @@
 			hidden_cases: 0,
 			visible_cases: 0,
 			generate_cases: 10
-		});
+		}); // TODO: validate this first, also move these routes into their own files?
 		if (res.ok) {
 			type Success = {
 				exit_code: undefined;
@@ -88,6 +89,13 @@
 
 	let selected = $selected_draft;
 	let exercise = $drafts[selected];
+
+	let view: EditorView;
+
+	const on_update = () => {
+		if (view) $data.generator_state = view.state.toJSON();
+		console.log($data.generator_state);
+	};
 </script>
 
 <Page center class="!max-w-4xl grow !flex-row items-stretch justify-stretch gap-1 p-2">
@@ -102,11 +110,15 @@
 		</header>
 		<section class="flex flex-shrink flex-col overflow-y-scroll !p-0">
 			{#if exercise}
-				<ExerciseForm bind:data />
+				<ExerciseForm
+					bind:data
+					on:update={on_update}
+					on:lang_change={(s) => onLangChange(s.detail?.value)}
+				/>
 			{/if}
 		</section>
 	</div>
-	<div class="card flex h-auto flex-grow flex-col flex-shrink !max-w-none">
+	<div class="card flex h-auto !max-w-none flex-shrink flex-grow flex-col">
 		{#if data && $data.selected_field}
 			{@const s = $data.selected_field}
 			{#if s === 'description'}
@@ -133,11 +145,11 @@
 				</div>
 				<Editor
 					class="grow"
-					bind:value={$data.generator}
 					bind:view
 					lang={$data.generator_lang}
 					readonly={$data.generator_lang === undefined}
-					{onLangChange}
+					initialStateJSON={$data.generator_state}
+					on:transactions={() => ($data.generator_state = view.state.toJSON())}
 				/>
 			{:else if s === 'table'}
 				<TestCaseEditor />

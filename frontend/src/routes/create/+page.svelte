@@ -6,9 +6,8 @@
 	export const selected_draft: Writable<number> = local_store('create/selected_draft', -1);
 	export type ExerciseDraft = Exercise & {
 		selected_field?: string;
-		generator?: string;
-		generator_lang?: string;
 		generate_cases?: number;
+		generator_state?: any;
 	};
 	export const drafts: Writable<ExerciseDraft[]> = local_store('create/drafts', []);
 </script>
@@ -21,7 +20,7 @@
 
 	import Page from '$lib/Page.svelte';
 	import { fly } from 'svelte/transition';
-	import { flip } from 'svelte/animate';
+	import type { EditorState } from '@codemirror/state';
 
 	let _drafts = $drafts;
 
@@ -62,10 +61,10 @@
 	<div class="card m-4">
 		<header>
 			<h1>Exercise Drafts</h1>
-			<p>
+			<span>
 				These drafts are stored locally on your device. When they are published, they will be
 				uploaded to your account and become available to other users.
-			</p>
+			</span>
 		</header>
 		<section class="flex-pass">
 			<Table.Root class="flex-pass my-0 select-none items-stretch">
@@ -89,9 +88,9 @@
 						</Table.Head>
 					</Table.Row>
 				</Table.Header>
-				<Table.Body class="flex-pass max-h-96 overflow-scroll">
+				<Table.Body class="flex-pass max-h-96">
 					{#each _drafts as ex, i}
-						<span out:fly={{ y: -50, duration: 200 }} >
+						<span out:fly={{ y: -50, duration: 200 }}>
 							<Table.Row class="hover:bg-muted/50 flex items-center justify-between">
 								<a class="block w-full no-underline" href="/edit" on:click={() => select_draft(i)}>
 									<Table.Cell class="relative w-full">

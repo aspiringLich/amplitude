@@ -78,6 +78,6 @@
 	}
 	
 	.flex-pass {
-		@apply flex flex-col shrink overflow-y-scroll;
+		@apply flex flex-col shrink overflow-y-auto;
 	}
 }

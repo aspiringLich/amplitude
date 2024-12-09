@@ -11,11 +11,16 @@
 	import { debounce } from '@melt-ui/svelte/internal/helpers';
 	import { superForm } from 'sveltekit-superforms';
 	import { toast } from 'svelte-sonner';
+	import type { EditorView } from '@codemirror/view';
+	import { createEventDispatcher } from 'svelte';
 
 	let selected = $selected_draft;
 	let exercise = $drafts[selected];
 
+	const dispatch = createEventDispatcher();
+
 	const update = debounce(() => {
+		dispatch('update');
 		$drafts[selected] = $data;
 	}, 500);
 
@@ -86,7 +91,7 @@
 			</Form.Field>
 
 			<h6 class="col-span-2 mt-2">Solution</h6>
-			
+
 			<h6 class="col-span-2 mt-2">Test Cases</h6>
 
 			<Form.Field {form} name="generator_lang" class="contents">
@@ -95,6 +100,7 @@
 					<Input {...attrs} type="hidden" bind:value={$data.generator_lang} />
 				</Form.Control>
 				<LangSelect
+					on:change={() => dispatch('lang_change')}
 					bind:value={$data.generator_lang}
 					filter={({ type }) => type == 'scripting'}
 					class="!mt-0"
