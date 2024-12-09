@@ -44,7 +44,7 @@
 
 <div class="flex h-screen w-screen flex-row overflow-hidden" bind:this={root_element}>
 	<aside
-		class="flex min-w-52 max-w-52 flex-col items-stretch justify-between
+		class="flex min-w-48 max-w-48 flex-col items-stretch justify-between
 		space-y-6 bg-zinc-800 py-4 text-white"
 	>
 		<div class="relative box-border h-20 w-full">
@@ -63,7 +63,7 @@
 			</div>
 			<a
 				class="sidebar absolute flex h-full w-full select-none
-				items-center justify-center text-center text-3xl font-bold italic"
+				items-center justify-center text-center text-3xl font-semibold italic"
 				href="/"
 			>
 				amplitude
@@ -100,7 +100,7 @@
 
 	.nav {
 		@apply block rounded-full;
-		@apply text-muted text-right text-2xl font-extrabold capitalize italic;
+		@apply text-muted text-right text-2xl capitalize italic;
 		@apply transition-colors;
 	}
 

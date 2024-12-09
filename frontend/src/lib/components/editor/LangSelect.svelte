@@ -15,7 +15,13 @@
 	let selected: Selected<string> = { value: value || '' };
 </script>
 
-<Select.Root selected={{ value, label: value }} onSelectedChange={(s) => dispatch('change', s)}>
+<Select.Root
+	selected={{ value, label: value }}
+	onSelectedChange={(s) => {
+		value = s?.value;
+		dispatch('change', s);
+	}}
+>
 	<Select.Trigger class="w-[180px] {className}">
 		<Select.Value placeholder="Select Language" />
 	</Select.Trigger>

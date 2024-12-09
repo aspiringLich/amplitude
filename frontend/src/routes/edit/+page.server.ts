@@ -2,7 +2,7 @@ import type { PageServerLoad, Actions } from './$types.js';
 import { fail } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
-import { exerciseSchema } from './schema';
+import { exerciseSchema } from '$src/routes/api/exec/schema.js';
 
 export const load: PageServerLoad = async () => {
 	return {

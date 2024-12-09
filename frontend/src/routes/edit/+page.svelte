@@ -15,8 +15,9 @@
 	import { request } from '$src/lib/request';
 	import { toast } from 'svelte-sonner';
 	import TestCaseEditor from '$src/routes/edit/TestCaseEditor.svelte';
-	import { onMount } from 'svelte';
-	import { EditorState } from '@codemirror/state';
+	import LangSelect from '$src/lib/components/editor/LangSelect.svelte';
+	import * as api from '$src/routes/api';
+	import NumberInput from '$src/lib/components/ui/input/NumberInput.svelte';
 
 	let prev_lang: string | number;
 	const onLangChange = (lang: keyof typeof langs | undefined) => {
@@ -53,31 +54,19 @@
 	};
 
 	const generate = async () => {
-		const res = await request.post('/api/exec/gen', {
+		const res = await api.exec.gen({
 			content: $data.generator,
 			language: $data.generator_lang,
-			inputs: [],
+			inputs: ['int'],
 			output: 'int',
-			hidden_cases: 0,
-			visible_cases: 0,
-			generate_cases: 10
-		}); // TODO: validate this first, also move these routes into their own files?
+			hidden_cases: 1,
+			visible_cases: 1,
+			generate_cases: $data.generate_cases
+		} as any);
 		if (res.ok) {
-			type Success = {
-				exit_code: undefined;
-				cases: { input: any[]; output: any }[];
-				stderr: string;
-				stdout: string;
-			};
-			type Failure = {
-				exit_code: number;
-				stderr: string;
-				stdout: string;
-			};
-			const json: Success | Failure = await res.json();
-
-			if (json.exit_code !== undefined) {
-				toast.error(`Program exited unsuccessfully with exit code ${json.exit_code}`);
+			const data = res.result;
+			if (data.exit_code !== undefined) {
+				toast.error(`Program exited unsuccessfully with exit code ${data.exit_code}`);
 			} else {
 				toast.success('Generated!');
 				console.log(res);
@@ -94,8 +83,9 @@
 
 	const on_update = () => {
 		if (view) $data.generator_state = view.state.toJSON();
-		console.log($data.generator_state);
 	};
+
+	let generate_cases_str = $data?.generate_cases?.toString();
 </script>
 
 <Page center class="!max-w-4xl grow !flex-row items-stretch justify-stretch gap-1 p-2">
@@ -124,12 +114,16 @@
 			{#if s === 'description'}
 				<RichEditor bind:content={$data.description} />
 			{:else if s === 'generator'}
-				<div class="flex flex-row items-center justify-between gap-2 border-b border-zinc-300 p-2">
+				<div class="flex flex-row items-center justify-between gap-2 p-2">
 					<Button variant="default" size="default" on:click={generate}>
 						<Play class="mr-1 h-4 w-4" />
 						Generate
 					</Button>
-					<Input type="number" placeholder="cases" class="w-20" bind:value={$data.generate_cases} />
+					<NumberInput
+						placeholder="cases"
+						class="w-20"
+						bind:value={$data.generate_cases}
+					/>
 					<span class="grow" />
 					<Button
 						variant="outline"
@@ -144,13 +138,20 @@
 					<GenerateDialog />
 				</div>
 				<Editor
-					class="grow"
+					class="shrink border-y border-zinc-300"
 					bind:view
 					lang={$data.generator_lang}
 					readonly={$data.generator_lang === undefined}
 					initialStateJSON={$data.generator_state}
 					on:transactions={() => ($data.generator_state = view.state.toJSON())}
 				/>
+				<div class="p-2">
+					<LangSelect
+						on:change={(s) => onLangChange(s.detail?.value)}
+						bind:value={$data.generator_lang}
+						filter={(l) => l.type == 'scripting'}
+					/>
+				</div>
 			{:else if s === 'table'}
 				<TestCaseEditor />
 			{:else}

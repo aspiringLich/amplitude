@@ -6,13 +6,13 @@
 	import { CornerUpRight } from 'lucide-svelte';
 
 	import { drafts, selected_draft } from '../create/+page.svelte';
-	import { exerciseSchema } from './schema';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { debounce } from '@melt-ui/svelte/internal/helpers';
 	import { superForm } from 'sveltekit-superforms';
 	import { toast } from 'svelte-sonner';
 	import type { EditorView } from '@codemirror/view';
 	import { createEventDispatcher } from 'svelte';
+	import { exerciseSchema } from '$src/routes/api/exec/schema';
 
 	let selected = $selected_draft;
 	let exercise = $drafts[selected];
@@ -63,7 +63,7 @@
 	};
 </script>
 
-<form method="POST" use:enhance class="flex flex-shrink flex-col overflow-y-scroll">
+<form method="POST" use:enhance class="flex flex-shrink flex-col overflow-y-scroll min-w-72">
 	<span class="flex flex-shrink flex-col overflow-y-scroll border-y border-zinc-300 px-6 py-4">
 		<Form.Field {form} name="title">
 			<Form.Control let:attrs>
@@ -90,23 +90,17 @@
 				<Form.FieldErrors class="col-span-2 !mt-0" />
 			</Form.Field>
 
-			<h6 class="col-span-2 mt-2">Solution</h6>
-
+			<h6 class="col-span-2 mt-2">Solution</h6>			
+			
 			<h6 class="col-span-2 mt-2">Test Cases</h6>
-
-			<Form.Field {form} name="generator_lang" class="contents">
+			<!-- <Form.Field {form} name="generator_lang" class="contents">
 				<Form.Control let:attrs>
 					<Form.Label class="flex items-center">Generator Language</Form.Label>
 					<Input {...attrs} type="hidden" bind:value={$data.generator_lang} />
 				</Form.Control>
-				<LangSelect
-					on:change={() => dispatch('lang_change')}
-					bind:value={$data.generator_lang}
-					filter={({ type }) => type == 'scripting'}
-					class="!mt-0"
-				/>
+				
 				<Form.FieldErrors class="col-span-2 !mt-0" />
-			</Form.Field>
+			</Form.Field> -->
 			<Form.Field {form} name="generator" class="contents">
 				<Form.Control let:attrs>
 					<Form.Label class="flex items-center">Generator</Form.Label>

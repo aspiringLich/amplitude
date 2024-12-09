@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
 	import { type Writable } from 'svelte/store';
 	import { local_store } from '$src/lib/local_store';
-	import type { Exercise } from '$src/routes/edit/schema';
+	import type { Exercise } from '$src/routes/api/exec/schema';
 
 	export const selected_draft: Writable<number> = local_store('create/selected_draft', -1);
 	export type ExerciseDraft = Exercise & {

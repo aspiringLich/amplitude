@@ -1,9 +1,10 @@
 import { names, langs } from '$src/lib/components/editor/lang';
 import { sanitize_html } from '$src/lib/utils';
+import { longStringSchema } from '$src/routes/api/schema';
 import type { Infer, SuperValidated } from 'sveltekit-superforms';
 import { z } from 'zod';
 
-const typeSchema = z
+export const typeSchema = z
 	.string()
 	.min(1)
 	.max(30)
@@ -21,24 +22,28 @@ const literalSchema = z.union([
 ]);
 type Literal = z.infer<typeof literalSchema>;
 
-const langSchema = z.enum(names);
+export const langSchema = z.enum(names);
+
+export const functionArgsSchema = z.array(typeSchema).min(1).max(8);
+export const generatorLangSchema = langSchema.refine(
+	(lang) => langs[lang].type == 'scripting',
+	'Language must be a scripting language'
+);
 
 export const exerciseSchema = z.object({
 	title: z.string().trim().min(5).max(32),
-	description: z.string().min(20).max(6000).superRefine(sanitize_html),
+	description: longStringSchema.min(20).superRefine(sanitize_html),
 	function_name: z
 		.string()
 		.min(1)
 		.max(50)
 		.regex(/[\w_][\w\d_]*/, 'Function name must be composed of characters [a-zA-Z0-9_]'),
-	input: z.array(typeSchema).max(8),
+	input: functionArgsSchema,
 	output: typeSchema,
-	starting_code: z.string().max(6000).optional(),
+	starting_code: longStringSchema.optional(),
 
-	generator_lang: langSchema
-		.refine((lang) => langs[lang].type == 'scripting', 'Language must be a scripting language')
-		.optional(),
-	generator: z.string().max(6000).optional(),
+	generator_lang: generatorLangSchema.optional(),
+	generator: longStringSchema.optional(),
 	generated_table: z.array(literalSchema).max(500)
 });
 

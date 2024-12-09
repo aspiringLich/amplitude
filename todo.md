@@ -14,6 +14,8 @@ EXERCISE EDITING UI
 -   [ ] Replace buttons with a `ToggleGroup`
 -   [ ] Tooltips!
 
+-   [x] Move API routes into one place
+
 CODE RUNNING / CODE EDITOR
 
 -   [x] Move language definitions into their own folder

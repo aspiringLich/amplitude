@@ -1,4 +1,5 @@
 import { browser, dev } from '$app/environment';
+import { toast } from 'svelte-sonner';
 
 class RequestClient {
 	async request(url: string, method: string, data?: any, init?: RequestInit) {
@@ -7,7 +8,11 @@ class RequestClient {
 		const req = new Request(url, opts);
 		if (data) req.headers.set('Content-Type', 'application/json');
 		const response = await fetch(req);
-		if (!response.ok) throw new Error(response.statusText);
+		if (!response.ok) {
+			let opts = {} as any;
+			if (response.bodyUsed) opts.description = (await response.text()).split('\n', 2)[0];
+			toast.error(`Error ${response.status}: ${response.statusText}`, opts);
+		}
 		return response;
 	}
 

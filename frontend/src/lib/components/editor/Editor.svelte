@@ -20,7 +20,6 @@
 	});
 	
 	onMount(() => {
-		console.log(initialStateJSON)
 		if (initialStateJSON) view.setState(EditorState.fromJSON(initialStateJSON));
 	});
 </script>
