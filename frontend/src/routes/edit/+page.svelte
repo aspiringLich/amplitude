@@ -64,13 +64,20 @@
 			reset_gen_view();
 		}
 	};
-
+	
+	const reset_solution_view = () => {
+		let cfg = {} as any;
+		cfg[$data.function_name] = { args: $data.args };
+		reset_view($data.solution_lang, cfg)
+	};
 	const reset_gen_view = () =>
-		reset_view($data.generator_lang, { gen: { args: ['ctx'] } } as any, view);
+		reset_view(
+			$data.generator_lang,
+			{ gen: { args: [{ arg: 'ctx', type: '' }], output: '' } },
+		);
 	const reset_view = (
 		lang: string | undefined,
 		cfg: { [key: string]: CodeFnDef },
-		view: EditorView
 	) => {
 		if (!lang) return;
 
@@ -119,7 +126,7 @@
 	$: solution_editor_enabled =
 		$data.args?.length &&
 		$data.output &&
-		$data.function_name !== undefined &&
+		$data.function_name?.length &&
 		$data.solution_lang !== undefined;
 
 	// const on_update = () => {
@@ -203,7 +210,7 @@
 							tooltip="Reset code"
 							disabled={!solution_editor_enabled}
 							aria-disabled={!solution_editor_enabled}
-							on:click={reset_gen_view}
+							on:click={reset_solution_view}
 						>
 							<!-- TODO: spin?? -->
 							<RefreshCcw class="h-4 w-4" />

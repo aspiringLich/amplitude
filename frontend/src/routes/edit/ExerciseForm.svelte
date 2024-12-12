@@ -101,6 +101,7 @@
 						}}
 						validate_value2={(value2) => {
 							let res = identifierSchema.safeParse(value2);
+							// TODO: no duplicates
 							return res.success;
 						}}
 					>

@@ -43,10 +43,9 @@
 					<Command.Item
 						value={item}
 						onSelect={(currentValue) => {
-							value = currentValue;
-							if (value && value2 && validate_value2(value2)) {
+							if (currentValue && value2 && validate_value2(value2)) {
 								closeAndFocusTrigger(ids.trigger);
-								dispatch('select', [value, value2]);
+								dispatch('select', [currentValue, value2]);
 								value = undefined;
 								value2 = undefined;
 							}
