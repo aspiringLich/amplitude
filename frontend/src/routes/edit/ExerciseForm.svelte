@@ -19,7 +19,7 @@
 
 	const dispatch = createEventDispatcher();
 
-	const select = (field: string) => {
+	const select = (field: string | undefined) => {
 		if ($data.selected_field === field) $data.selected_field = undefined;
 		else $data.selected_field = field;
 	};
@@ -28,8 +28,23 @@
 		else return 'outline';
 	};
 
+	$: solution_enabled = $data.args?.length && $data.output && update;
+	$: if (!solution_enabled && $data.selected_field == 'solution') select(undefined);
+
+	// NOTE: make sure this stays consistent on +page.svelte
+	$: solution_editor_enabled =
+		$data.args?.length &&
+		$data.output &&
+		$data.function_name?.length &&
+		$data.solution_lang !== undefined;
+	$: if (
+		!solution_editor_enabled &&
+		['generator', 'table'].indexOf($data.selected_field as string) != -1
+	)
+		select(undefined);
+
 	let types: string[] = valid_types(undefined);
-	let update = 0;
+	let update = 1;
 	let input_type_value: any;
 </script>
 
@@ -171,6 +186,7 @@
 				size="sm"
 				variant={variant($data, 'generator')}
 				class="!mt-0"
+				disabled={!solution_editor_enabled}
 			>
 				<span>Edit</span>
 				<CornerUpRight class="ml-2 h-4 w-4" />
@@ -187,6 +203,7 @@
 				size="sm"
 				variant={variant($data, 'table')}
 				class="!mt-0"
+				disabled={!solution_editor_enabled}
 			>
 				<span>Edit</span>
 				<CornerUpRight class="ml-2 h-4 w-4" />

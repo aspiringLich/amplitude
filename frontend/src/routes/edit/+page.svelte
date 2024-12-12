@@ -64,21 +64,15 @@
 			reset_gen_view();
 		}
 	};
-	
+
 	const reset_solution_view = () => {
 		let cfg = {} as any;
 		cfg[$data.function_name] = { args: $data.args };
-		reset_view($data.solution_lang, cfg)
+		reset_view($data.solution_lang, cfg);
 	};
 	const reset_gen_view = () =>
-		reset_view(
-			$data.generator_lang,
-			{ gen: { args: [{ arg: 'ctx', type: '' }], output: '' } },
-		);
-	const reset_view = (
-		lang: string | undefined,
-		cfg: { [key: string]: CodeFnDef },
-	) => {
+		reset_view($data.generator_lang, { gen: { args: [{ arg: 'ctx', type: '' }], output: '' } });
+	const reset_view = (lang: string | undefined, cfg: { [key: string]: CodeFnDef }) => {
 		if (!lang) return;
 
 		const code_fn: CodeFn = (langs[lang] as any).code; // fine b/c the only fields available to the lang editor are scripting langs
@@ -123,6 +117,8 @@
 	};
 
 	let view: EditorView;
+
+	// NOTE: make sure this stays consistent on ExerciseForm.svelte
 	$: solution_editor_enabled =
 		$data.args?.length &&
 		$data.output &&
@@ -183,7 +179,7 @@
 							<!-- TODO: spin?? -->
 							<RefreshCcw class="h-4 w-4" />
 						</Button>
-						<!-- <GenerateDialog /> -->
+						<GenerateDialog />
 					</div>
 					<Editor
 						class="shrink border-y border-zinc-300"
@@ -209,13 +205,12 @@
 							size="icon"
 							tooltip="Reset code"
 							disabled={!solution_editor_enabled}
-							aria-disabled={!solution_editor_enabled}
 							on:click={reset_solution_view}
 						>
 							<!-- TODO: spin?? -->
 							<RefreshCcw class="h-4 w-4" />
 						</Button>
-						<GenerateDialog />
+						<!-- <GenerateDialog /> -->
 					</div>
 					<Editor
 						class="shrink border-y border-zinc-300"
