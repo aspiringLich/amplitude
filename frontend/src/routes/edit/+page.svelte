@@ -6,7 +6,7 @@
 	import { Play, RefreshCcw } from 'lucide-svelte';
 
 	import { drafts, selected_draft } from '../create/+page.svelte';
-	import { langs, type CodeFn } from '$src/lib/components/editor/lang';
+	import { langs, type CodeFn, type CodeFnDef } from '$src/lib/components/editor/lang';
 	import type { EditorView } from 'codemirror';
 	import GenerateDialog from '$src/routes/edit/GenerateDialog.svelte';
 	import ExerciseForm from '$src/routes/edit/ExerciseForm.svelte';
@@ -19,6 +19,7 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { exerciseSchema } from '$src/routes/api/exec/schema';
+	import Input from '$src/lib/components/ui/input/input.svelte';
 
 	let selected = $selected_draft;
 	let exercise = $drafts[selected];
@@ -60,18 +61,22 @@
 		if (lang && view && prev_lang !== lang && !$data.generator?.trim()) {
 			console.assert(langs[lang].type == 'scripting');
 			prev_lang = lang;
-			reset();
+			reset_gen_view();
 		}
 	};
 
-	const reset = () => {
-		if (!$data.generator_lang) return;
+	const reset_gen_view = () =>
+		reset_view($data.generator_lang, { gen: { args: ['ctx'] } } as any, view);
+	const reset_view = (
+		lang: string | undefined,
+		cfg: { [key: string]: CodeFnDef },
+		view: EditorView
+	) => {
+		if (!lang) return;
 
-		const code_fn: CodeFn = (langs[$data.generator_lang] as any).code; // fine b/c the only fields available to the lang editor are scripting langs
+		const code_fn: CodeFn = (langs[lang] as any).code; // fine b/c the only fields available to the lang editor are scripting langs
 		if (!code_fn) return;
-		const { code, cursor } = code_fn({
-			gen: ['ctx']
-		});
+		const { code, cursor } = code_fn(cfg);
 		if (typeof cursor === 'number') {
 			const t = view.state.update({
 				changes: { from: 0, to: view.state.doc.length, insert: code },
@@ -111,6 +116,11 @@
 	};
 
 	let view: EditorView;
+	$: solution_editor_enabled =
+		$data.args?.length &&
+		$data.output &&
+		$data.function_name !== undefined &&
+		$data.solution_lang !== undefined;
 
 	// const on_update = () => {
 	// 	if (view) $data.generator_state = view.state.toJSON();
@@ -123,7 +133,7 @@
 		method="POST"
 		class="flex w-full !max-w-none !flex-row items-stretch justify-stretch gap-1 p-2"
 	>
-		<div class="card prose flex flex-col !overflow-visible min-w-72 max-w-72">
+		<div class="card prose flex min-w-72 max-w-72 flex-col !overflow-visible">
 			<header>
 				<h1>Edit Exercise</h1>
 				{#if exercise}
@@ -146,9 +156,9 @@
 		<div class="card flex h-auto !max-w-none grow flex-col">
 			{#if data && $data.selected_field}
 				{@const s = $data.selected_field}
-				{#if s === 'description'}
+				{#if s == 'description'}
 					<RichEditor bind:content={$data.description} />
-				{:else if s === 'generator'}
+				{:else if s == 'generator'}
 					<div class="flex flex-row items-center justify-between gap-2 p-2">
 						<Button variant="default" size="default" on:click={generate}>
 							<Play class="mr-1 h-4 w-4" />
@@ -161,12 +171,12 @@
 							size="icon"
 							tooltip="Reset code"
 							disabled={$data.generator_lang === undefined}
-							on:click={reset}
+							on:click={reset_gen_view}
 						>
 							<!-- TODO: spin?? -->
 							<RefreshCcw class="h-4 w-4" />
 						</Button>
-						<GenerateDialog />
+						<!-- <GenerateDialog /> -->
 					</div>
 					<Editor
 						class="shrink border-y border-zinc-300"
@@ -183,10 +193,47 @@
 							filter={(l) => l.type == 'scripting'}
 						/>
 					</div>
-				{:else if s === 'table'}
+				{:else if s == 'solution' && $data.args?.length && $data.output}
+					<div class="flex flex-row items-center justify-between gap-2 p-2">
+						<Input placeholder="Function Name" class="w-40" bind:value={$data.function_name} />
+						<span class="grow" />
+						<Button
+							variant="outline"
+							size="icon"
+							tooltip="Reset code"
+							disabled={!solution_editor_enabled}
+							aria-disabled={!solution_editor_enabled}
+							on:click={reset_gen_view}
+						>
+							<!-- TODO: spin?? -->
+							<RefreshCcw class="h-4 w-4" />
+						</Button>
+						<GenerateDialog />
+					</div>
+					<Editor
+						class="shrink border-y border-zinc-300"
+						bind:view
+						lang={$data.solution_lang}
+						readonly={!solution_editor_enabled}
+						initialStateJSON={$data.solution_state}
+						on:transactions={() => ($data.solution_state = view.state.toJSON())}
+					/>
+					<div class="p-2">
+						<LangSelect
+							on:change={(s) => onLangChange(s.detail?.value)}
+							bind:value={$data.solution_lang}
+							filter={(l) => l.type == 'scripting'}
+						/>
+					</div>
+				{:else if s == 'table'}
 					<TestCaseEditor />
 				{:else}
-					Selected an invalid field. This is a bug.
+					<div
+						class="text-muted-foreground flex h-full w-full select-none
+						items-center justify-center rounded-lg bg-zinc-100 italic"
+					>
+						<span>No Field Selected</span>
+					</div>
 				{/if}
 			{:else}
 				<div
@@ -200,12 +247,12 @@
 	</form>
 </Page>
 
-<style lang=postcss>
+<style lang="postcss">
 	form :global(div[data-fs-field-errors]) {
 		@apply cursor-default;
 	}
-	
+
 	form :global(div[data-fs-error]) {
-		@apply inline break-words leading-3 pb-4;
+		@apply inline break-words pb-4 leading-3;
 	}
 </style>

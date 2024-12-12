@@ -15,7 +15,19 @@ type Literal = z.infer<typeof literalSchema>;
 
 export const langSchema = z.enum(names);
 
-export const functionArgsSchema = z.array(typeSchema).min(1).max(8);
+export const identifierSchema = z
+		.string()
+		.min(1)
+		.max(50)
+		.regex(/[\w_][\w\d_]*/, 'Identifier must be composed of characters [a-zA-Z0-9_]');
+export const functionArgsSchema = z
+	.array(z.object({ arg: identifierSchema, type: typeSchema }))
+	.min(1)
+	.max(8);
+export const solutionLangSchema = langSchema.refine(
+	(lang) => langs[lang].type == 'scripting' || langs[lang].type == 'compiled',
+	'Language must be a programming language'
+);
 export const generatorLangSchema = langSchema.refine(
 	(lang) => langs[lang].type == 'scripting',
 	'Language must be a scripting language'
@@ -24,15 +36,12 @@ export const generatorLangSchema = langSchema.refine(
 export const exerciseSchema = z.object({
 	title: z.string().trim().min(5).max(32),
 	description: longStringSchema.min(20).superRefine(sanitize_html),
-	function_name: z
-		.string()
-		.min(1)
-		.max(50)
-		.regex(/[\w_][\w\d_]*/, 'Function name must be composed of characters [a-zA-Z0-9_]'),
-	input: functionArgsSchema,
+	function_name: identifierSchema,
+	args: functionArgsSchema,
 	output: typeSchema,
 	solution: longStringSchema,
-	
+	solution_lang: solutionLangSchema,
+
 	starting_code: longStringSchema.optional(),
 
 	generator_lang: generatorLangSchema.optional(),

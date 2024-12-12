@@ -8,6 +8,7 @@
 		selected_field?: string;
 		generate_cases?: number;
 		generator_state?: any;
+		solution_state?: any;
 	};
 	export const drafts: Writable<ExerciseDraft[]> = local_store('create/drafts', []);
 </script>
@@ -20,6 +21,7 @@
 
 	import Page from '$lib/Page.svelte';
 	import { fly } from 'svelte/transition';
+	import { any } from 'zod';
 
 	let _drafts = $drafts;
 
@@ -29,8 +31,10 @@
 				title: 'Untitled Exercise',
 				description: '',
 				solution: '',
+				solution_lang: undefined as any,
+				solution_state: undefined,
 				function_name: '',
-				input: [],
+				args: [],
 				output: '',
 				generated_table: [],
 				starting_code: '',

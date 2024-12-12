@@ -11,6 +11,8 @@
 	import { valid_types } from '$src/routes/api/schema';
 	import Badge from '$src/lib/components/ui/badge/badge.svelte';
 	import { createEventDispatcher } from 'svelte';
+	import ComboBox2 from '$src/lib/components/ui/ComboBox2.svelte';
+	import { identifierSchema } from '$src/routes/api/exec/schema';
 
 	export let data: Writable<ExerciseDraft>;
 	export let form: SuperForm<ExerciseDraft, any>;
@@ -28,6 +30,7 @@
 
 	let types: string[] = valid_types(undefined);
 	let update = 0;
+	let input_type_value: any;
 </script>
 
 <div class="flex-pass border-y border-zinc-300 px-6 py-4">
@@ -57,9 +60,9 @@
 		</Form.Field>
 
 		<h6 class="col-span-2 mt-2">Solution</h6>
-		<Form.Field {form} name="input" class="col-span-2">
+		<Form.Field {form} name="args" class="col-span-2">
 			<Form.Control let:attrs>
-				<Form.Label class="flex items-center">Input Types</Form.Label>
+				<Form.Label class="flex items-center">Arguments</Form.Label>
 				<Input {...attrs} type="hidden" />
 				<div class="flex">
 					<div
@@ -67,14 +70,14 @@
 						items-center space-x-1 overflow-x-scroll rounded-l border border-r-0 px-1 text-sm"
 					>
 						{#key update}
-							{#each $data.input ?? [] as input, i}
-								<Badge class="flex p-0">
-									<span class="my-0.5 ml-2.5">{input}</span>
+							{#each $data.args ?? [] as { type, arg }, i}
+								<Badge class="flex whitespace-nowrap p-0">
+									<span class="my-0.5 ml-2.5">{type} <i>{arg}</i></span>
 									<Button
 										size="icon-xs"
 										class="!bg-transparent p-1"
 										on:click={() => {
-											$data.input.splice(i, 1);
+											$data.args.splice(i, 1);
 											dispatch('update');
 											update += 1;
 										}}
@@ -85,16 +88,20 @@
 							{/each}
 						{/key}
 					</div>
-					<ComboBox
+					<ComboBox2
+						bind:value={input_type_value}
 						values={types}
 						let:builder
 						let:open
-						check={false}
 						on:select={(e) => {
-							if (!$data.input) $data.input = [];
-							$data.input.push(e.detail);
+							if (!$data.args) $data.args = [];
+							$data.args.push({ arg: e.detail[1], type: e.detail[0] });
 							dispatch('update');
 							update += 1;
+						}}
+						validate_value2={(value2) => {
+							let res = identifierSchema.safeParse(value2);
+							return res.success;
 						}}
 					>
 						<Button
@@ -107,7 +114,7 @@
 						>
 							<Plus class="h-4 w-4" />
 						</Button>
-					</ComboBox>
+					</ComboBox2>
 				</div>
 				<Form.FieldErrors class="col-span-2" />
 			</Form.Control>
@@ -134,7 +141,7 @@
 		</Form.Field>
 		<Form.Field {form} name="solution" class="contents">
 			<Form.Control let:attrs>
-				<Form.Label class="flex items-center">Solution Code</Form.Label>
+				<Form.Label class="flex items-center">Solution</Form.Label>
 				<Input {...attrs} type="hidden" bind:value={$data.solution} />
 			</Form.Control>
 			{#key update}
@@ -143,7 +150,7 @@
 					size="sm"
 					variant={variant($data, 'solution')}
 					class="!mt-0"
-					disabled={!($data.input?.length && $data.output)}
+					disabled={!($data.args?.length && $data.output)}
 				>
 					<span>Edit</span>
 					<CornerUpRight class="ml-2 h-4 w-4" />

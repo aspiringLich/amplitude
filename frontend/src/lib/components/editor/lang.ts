@@ -5,7 +5,8 @@ import { yaml } from '@codemirror/lang-yaml';
 import type { LanguageSupport } from '@codemirror/language';
 
 export type CodeFnReturn = { code: string; cursor: [number, number] | number };
-export type CodeFn = (fns: { [key: string]: string[] }) => CodeFnReturn;
+export type CodeFnDef = { args: string[]; arg_types: string[]; output: string };
+export type CodeFn = (fns: { [key: string]: CodeFnDef }) => CodeFnReturn;
 export type LangInfo =
 	| {
 			lang: LanguageSupport;
@@ -28,9 +29,9 @@ export const langs: { [key: string]: LangInfo } = {
 		code: (fns) => {
 			const entries = Object.entries(fns);
 			const code = entries
-				.map(([name, args]) => `def ${name}(${args.join(', ')}):\n\tpass\n`)
+				.map(([name, { args }]) => `def ${name}(${args.join(', ')}):\n\tpass\n`)
 				.join('\n');
-			const [name, args] = entries[0];
+			const [name, { args }] = entries[0];
 			const pos = 4 + name.length + 1 + args.join(', ').length + 4;
 			return {
 				code: `\n${code}`,
@@ -44,9 +45,9 @@ export const langs: { [key: string]: LangInfo } = {
 		code: (fns) => {
 			const entries = Object.entries(fns);
 			const code = entries
-				.map(([name, args]) => `export function ${name}(${args.join(', ')}) {\n\t\n}\n`)
+				.map(([name, { args }]) => `export function ${name}(${args.join(', ')}) {\n\t\n}\n`)
 				.join('\n');
-			const [name, args] = entries[0];
+			const [name, { args }] = entries[0];
 			const pos = 16 + name.length + 1 + args.join(', ').length + 5;
 			return {
 				code: `\n${code}`,
