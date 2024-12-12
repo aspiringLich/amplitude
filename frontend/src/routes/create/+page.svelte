@@ -20,7 +20,6 @@
 
 	import Page from '$lib/Page.svelte';
 	import { fly } from 'svelte/transition';
-	import type { EditorState } from '@codemirror/state';
 
 	let _drafts = $drafts;
 
@@ -29,6 +28,7 @@
 			e.push({
 				title: 'Untitled Exercise',
 				description: '',
+				solution: '',
 				function_name: '',
 				input: [],
 				output: '',

@@ -1,23 +1,59 @@
 <script lang="ts">
 	import Page from '$src/lib/Page.svelte';
 	import { Button } from '$src/lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
 	import RichEditor from '$src/lib/components/editor/RichEditor.svelte';
 	import Editor from '$src/lib/components/editor/Editor.svelte';
 	import { Play, RefreshCcw } from 'lucide-svelte';
 
-	import { drafts, selected_draft, type ExerciseDraft } from '../create/+page.svelte';
+	import { drafts, selected_draft } from '../create/+page.svelte';
 	import { langs, type CodeFn } from '$src/lib/components/editor/lang';
 	import type { EditorView } from 'codemirror';
 	import GenerateDialog from '$src/routes/edit/GenerateDialog.svelte';
 	import ExerciseForm from '$src/routes/edit/ExerciseForm.svelte';
-	import type { Writable } from 'svelte/store';
-	import { request } from '$src/lib/request';
 	import { toast } from 'svelte-sonner';
 	import TestCaseEditor from '$src/routes/edit/TestCaseEditor.svelte';
 	import LangSelect from '$src/lib/components/editor/LangSelect.svelte';
 	import * as api from '$src/routes/api';
 	import NumberInput from '$src/lib/components/ui/input/NumberInput.svelte';
+	import { debounce } from '@melt-ui/svelte/internal/helpers';
+	import { superForm } from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { exerciseSchema } from '$src/routes/api/exec/schema';
+
+	let selected = $selected_draft;
+	let exercise = $drafts[selected];
+
+	const update = debounce(() => {
+		$drafts[selected] = $data;
+	}, 500);
+
+	let form = superForm(exercise, {
+		validators: zodClient(exerciseSchema),
+		onChange: update,
+		onError: (e) => toast.error(e.result.error.message),
+		onSubmit: (e) => {
+			$drafts[selected] = $data;
+		},
+		onResult(e) {
+			let res = e.result;
+			switch (res.type) {
+				case 'error':
+					console.error(res);
+					toast.error(res.error.message);
+					break;
+				case 'success':
+					toast.success('Exercise submitted!');
+					break;
+				case 'failure':
+					console.error(res);
+					if (res.status != 400) toast.error(`Submission Failiure: ${res.status}`);
+					break;
+				case 'redirect':
+			}
+		},
+		dataType: 'json'
+	});
+	let { form: data, enhance, errors } = form;
 
 	let prev_lang: string | number;
 	const onLangChange = (lang: keyof typeof langs | undefined) => {
@@ -74,96 +110,102 @@
 		}
 	};
 
-	let data: Writable<ExerciseDraft>;
-
-	let selected = $selected_draft;
-	let exercise = $drafts[selected];
-
 	let view: EditorView;
 
-	const on_update = () => {
-		if (view) $data.generator_state = view.state.toJSON();
-	};
-
-	let generate_cases_str = $data?.generate_cases?.toString();
+	// const on_update = () => {
+	// 	if (view) $data.generator_state = view.state.toJSON();
+	// };
 </script>
 
-<Page center class="!max-w-4xl grow !flex-row items-stretch justify-stretch gap-1 p-2">
-	<div class="card prose flex flex-col !overflow-visible">
-		<header>
-			<h1>Edit Exercise</h1>
-			{#if exercise}
-				<span>Edit the exercise details below.</span>
-			{:else}
-				<span>No exercise found</span>
-			{/if}
-		</header>
-		<section class="flex flex-shrink flex-col overflow-y-scroll !p-0">
-			{#if exercise}
-				<ExerciseForm
-					bind:data
-					on:update={on_update}
-					on:lang_change={(s) => onLangChange(s.detail?.value)}
-				/>
-			{/if}
-		</section>
-	</div>
-	<div class="card flex h-auto !max-w-none flex-shrink flex-grow flex-col">
-		{#if data && $data.selected_field}
-			{@const s = $data.selected_field}
-			{#if s === 'description'}
-				<RichEditor bind:content={$data.description} />
-			{:else if s === 'generator'}
-				<div class="flex flex-row items-center justify-between gap-2 p-2">
-					<Button variant="default" size="default" on:click={generate}>
-						<Play class="mr-1 h-4 w-4" />
-						Generate
-					</Button>
-					<NumberInput
-						placeholder="cases"
-						class="w-20"
-						bind:value={$data.generate_cases}
+<Page center class="!max-w-4xl grow">
+	<form
+		use:enhance
+		method="POST"
+		class="flex w-full !max-w-none !flex-row items-stretch justify-stretch gap-1 p-2"
+	>
+		<div class="card prose flex flex-col !overflow-visible min-w-72 max-w-72">
+			<header>
+				<h1>Edit Exercise</h1>
+				{#if exercise}
+					<span>Edit the exercise details below.</span>
+				{:else}
+					<span>No exercise found</span>
+				{/if}
+			</header>
+			<section class="flex-pass !p-0">
+				{#if exercise}
+					<ExerciseForm
+						bind:data
+						bind:form
+						on:update={update}
+						on:lang_change={(s) => onLangChange(s.detail?.value)}
 					/>
-					<span class="grow" />
-					<Button
-						variant="outline"
-						size="icon"
-						tooltip="Reset code"
-						disabled={$data.generator_lang === undefined}
-						on:click={reset}
-					>
-						<!-- TODO: spin?? -->
-						<RefreshCcw class="h-4 w-4" />
-					</Button>
-					<GenerateDialog />
-				</div>
-				<Editor
-					class="shrink border-y border-zinc-300"
-					bind:view
-					lang={$data.generator_lang}
-					readonly={$data.generator_lang === undefined}
-					initialStateJSON={$data.generator_state}
-					on:transactions={() => ($data.generator_state = view.state.toJSON())}
-				/>
-				<div class="p-2">
-					<LangSelect
-						on:change={(s) => onLangChange(s.detail?.value)}
-						bind:value={$data.generator_lang}
-						filter={(l) => l.type == 'scripting'}
+				{/if}
+			</section>
+		</div>
+		<div class="card flex h-auto !max-w-none grow flex-col">
+			{#if data && $data.selected_field}
+				{@const s = $data.selected_field}
+				{#if s === 'description'}
+					<RichEditor bind:content={$data.description} />
+				{:else if s === 'generator'}
+					<div class="flex flex-row items-center justify-between gap-2 p-2">
+						<Button variant="default" size="default" on:click={generate}>
+							<Play class="mr-1 h-4 w-4" />
+							Generate
+						</Button>
+						<NumberInput placeholder="cases" class="w-20" bind:value={$data.generate_cases} />
+						<span class="grow" />
+						<Button
+							variant="outline"
+							size="icon"
+							tooltip="Reset code"
+							disabled={$data.generator_lang === undefined}
+							on:click={reset}
+						>
+							<!-- TODO: spin?? -->
+							<RefreshCcw class="h-4 w-4" />
+						</Button>
+						<GenerateDialog />
+					</div>
+					<Editor
+						class="shrink border-y border-zinc-300"
+						bind:view
+						lang={$data.generator_lang}
+						readonly={$data.generator_lang === undefined}
+						initialStateJSON={$data.generator_state}
+						on:transactions={() => ($data.generator_state = view.state.toJSON())}
 					/>
-				</div>
-			{:else if s === 'table'}
-				<TestCaseEditor />
+					<div class="p-2">
+						<LangSelect
+							on:change={(s) => onLangChange(s.detail?.value)}
+							bind:value={$data.generator_lang}
+							filter={(l) => l.type == 'scripting'}
+						/>
+					</div>
+				{:else if s === 'table'}
+					<TestCaseEditor />
+				{:else}
+					Selected an invalid field. This is a bug.
+				{/if}
 			{:else}
-				Selected an invalid field. This is a bug.
-			{/if}
-		{:else}
-			<div
-				class="text-muted-foreground flex h-full w-full select-none
+				<div
+					class="text-muted-foreground flex h-full w-full select-none
 						items-center justify-center rounded-lg bg-zinc-100 italic"
-			>
-				<span>No Field Selected</span>
-			</div>
-		{/if}
-	</div>
+				>
+					<span>No Field Selected</span>
+				</div>
+			{/if}
+		</div>
+	</form>
 </Page>
+
+<style lang=postcss>
+	form :global(div[data-fs-field-errors]) {
+		@apply cursor-default;
+	}
+	
+	form :global(div[data-fs-error]) {
+		@apply inline break-words leading-3 pb-4;
+	}
+</style>

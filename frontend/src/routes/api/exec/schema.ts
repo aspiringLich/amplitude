@@ -1,18 +1,9 @@
 import { names, langs } from '$src/lib/components/editor/lang';
 import { sanitize_html } from '$src/lib/utils';
+import { typeSchema } from '../schema';
 import { longStringSchema } from '$src/routes/api/schema';
 import type { Infer, SuperValidated } from 'sveltekit-superforms';
 import { z } from 'zod';
-
-export const typeSchema = z
-	.string()
-	.min(1)
-	.max(30)
-	.regex(
-		/^(bool|int|float|string)(?:\[\])*$|^(\w+)<(bool|int|float|string)>$/,
-		'Invalid type syntax'
-	); // TODO: match capturing groups & dynamically validate with language config
-
 
 const literalSchema = z.union([
 	z.string().max(1000, 'Strings may not be longer than 1000 bytes'),
@@ -40,6 +31,8 @@ export const exerciseSchema = z.object({
 		.regex(/[\w_][\w\d_]*/, 'Function name must be composed of characters [a-zA-Z0-9_]'),
 	input: functionArgsSchema,
 	output: typeSchema,
+	solution: longStringSchema,
+	
 	starting_code: longStringSchema.optional(),
 
 	generator_lang: generatorLangSchema.optional(),

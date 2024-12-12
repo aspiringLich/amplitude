@@ -2,7 +2,7 @@ import { request } from '$src/lib/request';
 import * as exec from '$src/routes/api/exec';
 import type { ValidationResult } from '$src/routes/api/schema';
 import { toast } from 'svelte-sonner';
-import type { z, ZodType } from 'zod';
+import { z, type ZodType } from 'zod';
 
 export { exec };
 
@@ -26,3 +26,4 @@ export const api_post = async <Res>(
 
 	return { ok: false, error, status };
 };
+

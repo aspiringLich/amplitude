@@ -20,6 +20,7 @@
 	});
 	
 	onMount(() => {
+		view.focus();
 		if (initialStateJSON) view.setState(EditorState.fromJSON(initialStateJSON));
 	});
 </script>

@@ -1,6 +1,7 @@
 import { request } from '$src/lib/request';
 import { api_post } from '$src/routes/api';
-import { functionArgsSchema, generatorLangSchema, typeSchema } from '$src/routes/api/exec/schema';
+import { functionArgsSchema, generatorLangSchema } from '$src/routes/api/exec/schema';
+import { typeSchema } from '../schema';
 import { longStringSchema, type ValidationResult } from '$src/routes/api/schema';
 import { z } from 'zod';
 

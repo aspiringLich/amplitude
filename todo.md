@@ -13,6 +13,7 @@ EXERCISE EDITING UI
 -   [ ] Get rid of melt ui-- shadcn does it all for us already
 -   [ ] Replace buttons with a `ToggleGroup`
 -   [ ] Tooltips!
+-   [ ] Make the editors also cleanly transition like the pages
 
 -   [x] Move API routes into one place
 
@@ -25,6 +26,7 @@ CODE RUNNING / CODE EDITOR
 -   [ ] Write stdout / stderr as backslash-escaped strings: https://github.com/serde-rs/serde/issues/2502
 -   [ ] CONFETTI
 -   [ ] Grey out editor when disabled
+-   [ ] Have docker containers write their output to a file instead
 
 MANAGE EXERCISES / GROUPS / CLASSROOMS
 
